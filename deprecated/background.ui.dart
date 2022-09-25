@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class Background extends StatelessWidget {
-  const Background({Key? key}) : super(key: key);
+class BackgroundUI extends StatelessWidget {
+  const BackgroundUI({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -9,11 +9,11 @@ class Background extends StatelessWidget {
 
     return Align(
         alignment: Alignment.topLeft,
-        child: CustomPaint(painter: BackgroundPaths(), child: SizedBox(width: size.width, height: size.height)));
+        child: CustomPaint(painter: BackgroundPathsUI(), child: SizedBox(width: size.width, height: size.height)));
   }
 }
 
-class BackgroundPaths extends CustomPainter {
+class BackgroundPathsUI extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint = Paint();

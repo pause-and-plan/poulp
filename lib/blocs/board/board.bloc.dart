@@ -18,19 +18,43 @@ class BoardDimensions {
   static int get length => rows * columns;
 }
 
+enum BoardSwapStatus { listening, started, inProgress, blockedDuringAnimation }
+
 class BoardBloc extends Bloc<BoardEvent, BoardState> {
   BoardBloc() : super(BoardState.initial()) {
-    on<BoardReady>((event, emit) => emit(BoardState.ready(allBoxes)));
+    on<BoardReady>((event, emit) {
+      emit(BoardState.ready(allBoxes));
+    });
+
     on<BoxSwapStart>((event, emit) {
-      handleDragStart(event.position);
-      emit(BoardState.ready(allBoxes));
+      if (swapStatus != BoardSwapStatus.blockedDuringAnimation) {
+        swapStatus = BoardSwapStatus.started;
+        handleDragStart(event.position);
+        emit(BoardState.ready(allBoxes));
+      }
     });
+
     on<BoxSwapUpdate>((event, emit) {
-      handleDragUpdate(event.position, event.delta);
+      if (swapStatus == BoardSwapStatus.started || swapStatus == BoardSwapStatus.inProgress) {
+        swapStatus = BoardSwapStatus.inProgress;
+        handleDragUpdate(event.position, event.delta);
+        emit(BoardState.ready(allBoxes));
+      }
+    });
+
+    on<BoxSwapEnd>((event, emit) {
+      if (swapStatus == BoardSwapStatus.inProgress) {
+        swapStatus = BoardSwapStatus.blockedDuringAnimation;
+        handleDragEnd();
+        emit(BoardState.ready(allBoxes));
+      }
+    });
+
+    on<InsertNewBoxes>((event, emit) {
       emit(BoardState.ready(allBoxes));
     });
-    on<BoxSwapEnd>((event, emit) {
-      handleDragEnd();
+
+    on<RemoveBoxes>((event, emit) {
       emit(BoardState.ready(allBoxes));
     });
 
@@ -42,14 +66,16 @@ class BoardBloc extends Bloc<BoardEvent, BoardState> {
     while (isThereSomethingToCrush()) {
       scaleDownBoxes();
       insertNewBoxes();
-      add(BoardReady());
-      await Future.delayed(const Duration(milliseconds: 200));
+      add(InsertNewBoxes());
+      await Future.delayed(const Duration(milliseconds: 800));
       removeBoxes();
-      add(BoardReady());
+      add(RemoveBoxes());
       await Future.delayed(const Duration(milliseconds: 200));
     }
+    swapStatus = BoardSwapStatus.listening;
   }
 
+  BoardSwapStatus swapStatus = BoardSwapStatus.listening;
   List<Box> boxes = List.generate(BoardDimensions.length, Box.generate);
   List<List<Box>> newBoxes = List.generate(BoardDimensions.columns, (_) => List.empty(growable: true));
   List<Box> get allBoxes => [

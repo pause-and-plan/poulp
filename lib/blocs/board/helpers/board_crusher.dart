@@ -14,8 +14,9 @@ extension BoardCrusher on BoardBloc {
   scaleDownBoxes() {
     List<Key> keys = getAllMatch3BoxKeys();
     for (Key key in keys) {
-      box(getIndexByKey(key))?.scale = 0;
-      box(getIndexByKey(key))?.scaleDuration = const Duration(milliseconds: 200);
+      box(getIndexByKey(key))?.shouldCollapse = true;
+      // box(getIndexByKey(key))?.scale = 0.5;
+      // box(getIndexByKey(key))?.scaleDuration = const Duration(milliseconds: 200);
     }
   }
 

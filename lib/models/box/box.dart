@@ -4,6 +4,14 @@ import 'package:poulp/helpers/offset.dart';
 
 enum BoxType { blue, green, yellow, red }
 
+class BoxAnimations {
+  static String blue = 'assets/drop_blue.riv';
+  static String red = 'assets/drop_red.riv';
+  static String green = 'assets/drop_green.riv';
+  static String yellow = 'assets/drop_yellow.riv';
+  static String none = 'no_asset';
+}
+
 class BoxDimensions {
   static double height = 50;
   static double width = 50;
@@ -32,6 +40,7 @@ class Box {
   Duration fallDuration = Duration.zero;
   double scale = 1;
   Duration scaleDuration = Duration.zero;
+  bool shouldCollapse = false;
 
   Color get color {
     if (type == BoxType.blue) {
@@ -44,6 +53,20 @@ class Box {
       return Colors.red;
     } else {
       return Colors.white;
+    }
+  }
+
+  String get assetPath {
+    if (type == BoxType.blue) {
+      return BoxAnimations.blue;
+    } else if (type == BoxType.green) {
+      return BoxAnimations.green;
+    } else if (type == BoxType.yellow) {
+      return BoxAnimations.yellow;
+    } else if (type == BoxType.red) {
+      return BoxAnimations.red;
+    } else {
+      return BoxAnimations.none;
     }
   }
 

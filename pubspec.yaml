@@ -51,7 +51,10 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/drop.png
-    - assets/drop.riv
+    - assets/drop_blue.riv
+    - assets/drop_red.riv
+    - assets/drop_green.riv
+    - assets/drop_yellow.riv
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
   # For details regarding adding assets from package dependencies, see

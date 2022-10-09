@@ -9,21 +9,23 @@ class BoardUI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    BoardBloc board = context.read<BoardBloc>();
+
     return Container(
       margin: const EdgeInsets.only(top: 100),
       padding: const EdgeInsets.all(5),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), color: Colors.white24),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), color: const Color(0xFF33588D)),
       width: BoardDimensions.columns * BoxDimensions.totalWidth + 10,
       height: BoardDimensions.rows * BoxDimensions.totalHeight + 10,
       child: GestureDetector(
         onPanStart: (details) {
-          context.read<BoardBloc>().add(BoxSwapStart(details.localPosition));
+          board.add(BoxSwapStart(details.localPosition));
         },
         onPanUpdate: (details) {
-          context.read<BoardBloc>().add(BoxSwapUpdate(details.localPosition, details.delta));
+          board.add(BoxSwapUpdate(details.localPosition, details.delta));
         },
         onPanEnd: (_) {
-          context.read<BoardBloc>().add(BoxSwapEnd());
+          board.add(BoxSwapEnd());
         },
         child: BlocSelector<BoardBloc, BoardState, List<BoxContainerUI>>(
           selector: ((state) {

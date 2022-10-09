@@ -59,6 +59,7 @@ extension BoardSwapper on BoardBloc {
 
   _tryToSwapBoxes() {
     if (_isSwapTresholdReached() == false) {
+      swapStatus = BoardSwapStatus.listening;
       return;
     }
 
@@ -69,6 +70,7 @@ extension BoardSwapper on BoardBloc {
       return;
     }
     _swapBoxes();
+    swapStatus = BoardSwapStatus.listening;
   }
 
   bool _shouldCrushBoxes(int index) {

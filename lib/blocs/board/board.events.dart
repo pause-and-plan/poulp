@@ -4,6 +4,10 @@ abstract class BoardEvent {}
 
 class BoardReady extends BoardEvent {}
 
+class InsertNewBoxes extends BoardEvent {}
+
+class RemoveBoxes extends BoardEvent {}
+
 class BoxSwapStart extends BoardEvent {
   BoxSwapStart(this.position);
 

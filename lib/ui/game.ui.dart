@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:poulp/ui/board.ui.dart';
+import 'package:poulp/ui/header/header.ui.dart';
 
 class GameUI extends StatefulWidget {
   const GameUI({Key? key, required this.title}) : super(key: key);
@@ -18,7 +19,9 @@ class _GameUIState extends State<GameUI> {
         height: double.infinity,
         width: double.infinity,
         color: Colors.black87,
-        child: const Center(child: BoardUI()),
+        child: Column(
+          children: const [HeaderUI(), Center(child: BoardUI())],
+        ),
       ),
     );
   }

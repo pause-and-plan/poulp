@@ -18,19 +18,27 @@ class BoardDimensions {
   static int get length => rows * columns;
 }
 
+class BoardMoves {
+  static int initialAmount = 5;
+}
+
+class BoardScore {
+  static int boxScore = 40;
+}
+
 enum BoardSwapStatus { listening, started, inProgress, blockedDuringAnimation }
 
 class BoardBloc extends Bloc<BoardEvent, BoardState> {
-  BoardBloc() : super(BoardState.initial()) {
+  BoardBloc() : super(BoardState.initial(BoardMoves.initialAmount)) {
     on<BoardReady>((event, emit) {
-      emit(BoardState.ready(allBoxes));
+      emit(buildReadyState());
     });
 
     on<BoxSwapStart>((event, emit) {
       if (swapStatus != BoardSwapStatus.blockedDuringAnimation) {
         swapStatus = BoardSwapStatus.started;
         handleDragStart(event.position);
-        emit(BoardState.ready(allBoxes));
+        emit(buildReadyState());
       }
     });
 
@@ -38,7 +46,7 @@ class BoardBloc extends Bloc<BoardEvent, BoardState> {
       if (swapStatus == BoardSwapStatus.started || swapStatus == BoardSwapStatus.inProgress) {
         swapStatus = BoardSwapStatus.inProgress;
         handleDragUpdate(event.position, event.delta);
-        emit(BoardState.ready(allBoxes));
+        emit(buildReadyState());
       }
     });
 
@@ -46,34 +54,45 @@ class BoardBloc extends Bloc<BoardEvent, BoardState> {
       if (swapStatus == BoardSwapStatus.inProgress) {
         swapStatus = BoardSwapStatus.blockedDuringAnimation;
         handleDragEnd();
-        emit(BoardState.ready(allBoxes));
+        emit(buildReadyState());
       }
     });
 
     on<InsertNewBoxes>((event, emit) {
-      emit(BoardState.ready(allBoxes));
+      emit(buildReadyState());
     });
 
     on<RemoveBoxes>((event, emit) {
-      emit(BoardState.ready(allBoxes));
+      emit(buildReadyState());
     });
 
     generateBoard();
     add(BoardReady());
   }
 
+  buildReadyState() {
+    return BoardState.ready(allBoxes, score, movesLeft);
+  }
+
   handleSuccessfulSwap() async {
+    movesLeft--;
     while (isThereSomethingToCrush()) {
+      cascadeIndex++;
       scaleDownBoxes();
       insertNewBoxes();
       add(InsertNewBoxes());
-      await Future.delayed(const Duration(milliseconds: 800));
+      await Future.delayed(const Duration(milliseconds: 400));
       removeBoxes();
       add(RemoveBoxes());
       await Future.delayed(const Duration(milliseconds: 200));
     }
     swapStatus = BoardSwapStatus.listening;
+    cascadeIndex = 0;
   }
+
+  int cascadeIndex = 0;
+  int score = 0;
+  int movesLeft = BoardMoves.initialAmount;
 
   BoardSwapStatus swapStatus = BoardSwapStatus.listening;
   List<Box> boxes = List.generate(BoardDimensions.length, Box.generate);

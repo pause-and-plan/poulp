@@ -24,6 +24,7 @@ class BoxUI extends StatelessWidget {
           scale: state.scale,
           duration: state.scaleDuration,
           child: Container(
+            clipBehavior: Clip.none,
             height: 50,
             width: 50,
             decoration: BoxDecoration(

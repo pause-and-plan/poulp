@@ -45,6 +45,7 @@ extension BoardCrusher on BoardBloc {
     List<Key> keys = getAllMatch3BoxKeys();
     for (Key key in keys) {
       _removeBox(key);
+      score += BoardScore.boxScore * cascadeIndex;
     }
   }
 

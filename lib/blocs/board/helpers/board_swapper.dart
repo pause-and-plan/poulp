@@ -30,8 +30,15 @@ extension BoardSwapper on BoardBloc {
   }
 
   handleDragEnd() {
+    if (movesLeft == 0) {
+      _resetBoxesMovements();
+      swapStatus = BoardSwapStatus.listening;
+      return;
+    }
+
     if (draggedBox == null || swappedBox == null) {
       _resetBoxesMovements();
+      swapStatus = BoardSwapStatus.listening;
       return;
     }
 

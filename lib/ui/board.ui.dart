@@ -12,6 +12,7 @@ class BoardUI extends StatelessWidget {
     BoardBloc board = context.read<BoardBloc>();
 
     return Container(
+      clipBehavior: Clip.hardEdge,
       margin: const EdgeInsets.only(top: 100),
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), color: const Color(0xFF33588D)),
@@ -32,7 +33,7 @@ class BoardUI extends StatelessWidget {
             return state.boxes.map((e) => BoxContainerUI(key: e.key)).toList();
           }),
           builder: ((context, state) {
-            return Stack(children: state);
+            return Stack(clipBehavior: Clip.none, children: state);
           }),
         ),
       ),

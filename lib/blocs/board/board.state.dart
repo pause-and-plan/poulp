@@ -6,18 +6,17 @@ enum BoardStatus {
 }
 
 class BoardState extends Equatable {
-  const BoardState(
-    this.status,
-    this.boxes,
-  );
+  const BoardState(this.status, this.boxes, this.score, this.movesLeft);
 
-  factory BoardState.initial() => const BoardState(BoardStatus.initial, []);
-  factory BoardState.ready(List<Box> boxes) {
-    return BoardState(BoardStatus.ready, toBoxStateList(boxes));
+  factory BoardState.initial(int moveLeft) => BoardState(BoardStatus.initial, const [], 0, moveLeft);
+  factory BoardState.ready(List<Box> boxes, int score, int moveLeft) {
+    return BoardState(BoardStatus.ready, toBoxStateList(boxes), score, moveLeft);
   }
 
   final BoardStatus status;
   final List<BoxState> boxes;
+  final int score;
+  final int movesLeft;
 
   static List<BoxState> toBoxStateList(List<Box> boxes) {
     return boxes

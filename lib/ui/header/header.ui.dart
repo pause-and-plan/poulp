@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:poulp/screens/game/header/moves_counter.ui.dart';
-import 'package:poulp/screens/game/header/restart.ui.dart';
-import 'package:poulp/screens/game/header/score.ui.dart';
+import 'package:poulp/ui/header/score.ui.dart';
+
+import 'moves_counter.ui.dart';
+import 'restart.ui.dart';
 
 class HeaderUI extends StatelessWidget {
   const HeaderUI({Key? key}) : super(key: key);

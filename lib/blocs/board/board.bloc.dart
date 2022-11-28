@@ -4,9 +4,9 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poulp/models/box/box.dart';
-import 'package:poulp/blocs/board/helpers/board_generator.dart';
-import 'package:poulp/blocs/board/helpers/board_crusher.dart';
-import 'package:poulp/blocs/board/helpers/board_swapper.dart';
+import 'package:poulp/blocs/board/extensions/board_generator.dart';
+import 'package:poulp/blocs/board/extensions/board_crusher.dart';
+import 'package:poulp/blocs/board/extensions/board_swapper.dart';
 
 part 'board.events.dart';
 part 'board.state.dart';

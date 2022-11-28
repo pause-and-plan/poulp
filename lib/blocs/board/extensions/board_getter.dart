@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:poulp/blocs/board/board.bloc.dart';
-import 'package:poulp/helpers/list.dart';
+import 'package:poulp/extensions/list.dart';
 import 'package:poulp/models/box/box.dart';
 
 extension BoardGetter on BoardBloc {

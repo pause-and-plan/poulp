@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:poulp/blocs/board/board.bloc.dart';
-import 'package:poulp/helpers/offset.dart';
+import 'package:poulp/extensions/offset.dart';
 
 enum BoxType { blue, green, yellow, red }
 

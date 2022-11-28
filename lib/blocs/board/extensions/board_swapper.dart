@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:poulp/blocs/board/board.bloc.dart';
-import 'package:poulp/blocs/board/helpers/board_getter.dart';
+import 'package:poulp/blocs/board/extensions/board_getter.dart';
 import 'package:poulp/models/box/box.dart';
 
 extension BoardSwapper on BoardBloc {

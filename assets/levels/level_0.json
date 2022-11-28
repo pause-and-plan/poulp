@@ -1,0 +1,7 @@
+{
+  "version": 0.01,
+  "mode": "score",
+  "scoreTargets": [100, 200, 300],
+  "randomSeed": 0,
+  "tileMap": [["001"]]
+}

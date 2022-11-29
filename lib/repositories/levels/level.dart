@@ -9,7 +9,7 @@ enum GameMode {
   item,
 }
 
-enum Tiles {
+enum TileCodes {
   @JsonValue('001')
   emptySpace,
   @JsonValue('002')
@@ -46,8 +46,8 @@ class Level {
   GameMode mode = GameMode.score;
   List<int> scoreTargets = [100, 200, 300];
   int randomSeed = 0;
-  List<List<Tiles>> tileMap = [
-    [Tiles.emptySpace]
+  List<List<TileCodes>> tileMap = [
+    [TileCodes.emptySpace]
   ];
 
   Level();

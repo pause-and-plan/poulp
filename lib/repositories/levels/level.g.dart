@@ -14,7 +14,7 @@ Level _$LevelFromJson(Map<String, dynamic> json) => Level()
   ..randomSeed = json['randomSeed'] as int
   ..tileMap = (json['tileMap'] as List<dynamic>)
       .map((e) => (e as List<dynamic>)
-          .map((e) => $enumDecode(_$TilesEnumMap, e))
+          .map((e) => $enumDecode(_$TileCodesEnumMap, e))
           .toList())
       .toList();
 
@@ -24,7 +24,7 @@ Map<String, dynamic> _$LevelToJson(Level instance) => <String, dynamic>{
       'scoreTargets': instance.scoreTargets,
       'randomSeed': instance.randomSeed,
       'tileMap': instance.tileMap
-          .map((e) => e.map((e) => _$TilesEnumMap[e]!).toList())
+          .map((e) => e.map((e) => _$TileCodesEnumMap[e]!).toList())
           .toList(),
     };
 
@@ -35,19 +35,19 @@ const _$GameModeEnumMap = {
   GameMode.item: 'item',
 };
 
-const _$TilesEnumMap = {
-  Tiles.emptySpace: '001',
-  Tiles.emptyTile: '002',
-  Tiles.matchable: '003',
-  Tiles.matchableSpawner: '004',
-  Tiles.matchableHorizontal: '005',
-  Tiles.matchableVertical: '006',
-  Tiles.matchableWrapped: '007',
-  Tiles.blockerLevel1: '008',
-  Tiles.blockerLevel2: '009',
-  Tiles.blockerLevel3: '010',
-  Tiles.wrapperLevel1: '011',
-  Tiles.wrapperLevel2: '012',
-  Tiles.wrapperLevel3: '013',
-  Tiles.item: '014',
+const _$TileCodesEnumMap = {
+  TileCodes.emptySpace: '001',
+  TileCodes.emptyTile: '002',
+  TileCodes.matchable: '003',
+  TileCodes.matchableSpawner: '004',
+  TileCodes.matchableHorizontal: '005',
+  TileCodes.matchableVertical: '006',
+  TileCodes.matchableWrapped: '007',
+  TileCodes.blockerLevel1: '008',
+  TileCodes.blockerLevel2: '009',
+  TileCodes.blockerLevel3: '010',
+  TileCodes.wrapperLevel1: '011',
+  TileCodes.wrapperLevel2: '012',
+  TileCodes.wrapperLevel3: '013',
+  TileCodes.item: '014',
 };

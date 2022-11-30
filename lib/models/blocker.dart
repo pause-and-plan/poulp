@@ -1,6 +1,8 @@
 enum Blockers { wrapper, block }
 
 class Blocker {
-  Blockers type = Blockers.block;
-  int level = 0;
+  Blocker(this.type, {this.level = 0});
+
+  Blockers type;
+  int level;
 }

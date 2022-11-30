@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'level.g.dart';
@@ -23,7 +24,7 @@ enum TileCodes {
   @JsonValue('006')
   matchableVertical,
   @JsonValue('007')
-  matchableWrapped,
+  matchableBomb,
   @JsonValue('008')
   blockerLevel1,
   @JsonValue('009')
@@ -37,8 +38,10 @@ enum TileCodes {
   @JsonValue('013')
   wrapperLevel3,
   @JsonValue('014')
-  item,
+  collectible,
 }
+
+const Size boardDimensions = Size(9, 9);
 
 @JsonSerializable()
 class Level {

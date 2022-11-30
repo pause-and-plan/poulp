@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:poulp/models/blocker.dart';
+import 'package:poulp/models/collectible.dart';
 import 'package:poulp/models/matchable.dart';
 import 'package:poulp/models/transformable.dart';
 
@@ -19,9 +20,19 @@ class Tile {
   // content
   Matchable? matchable;
   Blocker? blocker;
+  Collectible? collectible;
 
   // transformations
   Transformable container = Transformable(TileDimensions.size);
+}
+
+extension TileDebugger on Tile {
+  debug() {
+    print('>---');
+    if (matchable != null) print('tile match: ${matchable?.match.name}');
+    if (blocker != null) print('tile blocker: ${blocker?.type.name}');
+    if (collectible != null) print('tile collectible: ${collectible?.type.name}');
+  }
 }
 
 extension TileExploder on Tile {

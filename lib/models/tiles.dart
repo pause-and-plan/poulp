@@ -18,7 +18,7 @@ extension TilesGenerator on List<Tile> {
     var y = _yFromIndex(index);
     var x = _xFromIndex(index);
     var code = _codeFromYX(level, y, x);
-    var options = [...Matchables.values];
+    var options = [...level.matchables];
 
     if (!code.isMatchable()) {
       Tile? tile = _codeToTile(level, code, options)?..setPositionFromYX(y, x);

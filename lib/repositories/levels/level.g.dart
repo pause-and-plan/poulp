@@ -9,30 +9,36 @@ part of 'level.dart';
 Level _$LevelFromJson(Map<String, dynamic> json) => Level()
   ..version = (json['version'] as num).toDouble()
   ..mode = $enumDecode(_$GameModeEnumMap, json['mode'])
-  ..scoreTargets =
-      (json['scoreTargets'] as List<dynamic>).map((e) => e as int).toList()
+  ..scoreTargets = (json['scoreTargets'] as List<dynamic>).map((e) => e as int).toList()
+  ..matchables = (json['matchables'] as List<dynamic>).map((e) => $enumDecode(_$MatchablesEnumMap, e)).toList()
   ..randomSeed = json['randomSeed'] as int
   ..tileMap = (json['tileMap'] as List<dynamic>)
-      .map((e) => (e as List<dynamic>)
-          .map((e) => $enumDecode(_$TileCodesEnumMap, e))
-          .toList())
+      .map((e) => (e as List<dynamic>).map((e) => $enumDecode(_$TileCodesEnumMap, e)).toList())
       .toList();
 
 Map<String, dynamic> _$LevelToJson(Level instance) => <String, dynamic>{
       'version': instance.version,
       'mode': _$GameModeEnumMap[instance.mode]!,
       'scoreTargets': instance.scoreTargets,
+      'matchables': instance.matchables.map((e) => _$MatchablesEnumMap[e]!).toList(),
       'randomSeed': instance.randomSeed,
-      'tileMap': instance.tileMap
-          .map((e) => e.map((e) => _$TileCodesEnumMap[e]!).toList())
-          .toList(),
+      'tileMap': instance.tileMap.map((e) => e.map((e) => _$TileCodesEnumMap[e]!).toList()).toList(),
     };
 
 const _$GameModeEnumMap = {
   GameMode.score: 'score',
   GameMode.blocker: 'blocker',
-  GameMode.jelly: 'jelly',
-  GameMode.item: 'item',
+  GameMode.wrapper: 'wrapper',
+  GameMode.collectible: 'collectible',
+};
+
+const _$MatchablesEnumMap = {
+  Matchables.purple: 'purple',
+  Matchables.blue: 'blue',
+  Matchables.green: 'green',
+  Matchables.yellow: 'yellow',
+  Matchables.orange: 'orange',
+  Matchables.red: 'red',
 };
 
 const _$TileCodesEnumMap = {

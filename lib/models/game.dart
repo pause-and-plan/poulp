@@ -6,7 +6,7 @@ import 'package:poulp/models/tile.dart';
 import 'package:poulp/models/tiles.dart';
 import 'package:poulp/repositories/levels/level.dart';
 
-// 1. generateFromLevel
+// 1. generateFromLevel DONE
 // 2. swapTiles
 // 3. explodingReaction
 // 4. reset

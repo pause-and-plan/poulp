@@ -3,12 +3,9 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'level.g.dart';
 
-enum GameMode {
-  score,
-  blocker,
-  jelly,
-  item,
-}
+enum GameMode { score, blocker, wrapper, collectible }
+
+enum Matchables { purple, blue, green, yellow, orange, red }
 
 enum TileCodes {
   @JsonValue('001')
@@ -65,6 +62,7 @@ class Level {
   double version = 0.01;
   GameMode mode = GameMode.score;
   List<int> scoreTargets = [100, 200, 300];
+  List<Matchables> matchables = Matchables.values;
   int randomSeed = 0;
   List<List<TileCodes>> tileMap = [
     [TileCodes.emptySpace]

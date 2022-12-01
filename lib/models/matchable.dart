@@ -1,9 +1,7 @@
 import 'dart:math';
 
 import 'package:poulp/helpers/random.dart';
-
-// enum Matchables { purple, blue, green, yellow, orange, red }
-enum Matchables { purple, blue }
+import 'package:poulp/repositories/levels/level.dart';
 
 enum SpecialMatchables { horizontal, vertical, bomb }
 

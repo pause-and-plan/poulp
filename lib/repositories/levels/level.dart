@@ -41,6 +41,23 @@ enum TileCodes {
   collectible,
 }
 
+extension TileCodesUtils on TileCodes {
+  bool isMatchable() {
+    switch (this) {
+      case TileCodes.matchable:
+      case TileCodes.matchableHorizontal:
+      case TileCodes.matchableVertical:
+      case TileCodes.matchableBomb:
+      case TileCodes.wrapperLevel1:
+      case TileCodes.wrapperLevel2:
+      case TileCodes.wrapperLevel3:
+        return true;
+      default:
+        return false;
+    }
+  }
+}
+
 const Size boardDimensions = Size(9, 9);
 
 @JsonSerializable()

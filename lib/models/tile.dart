@@ -24,18 +24,23 @@ class Tile {
 
   // transformations
   Transformable container = Transformable(TileDimensions.size);
-}
 
-extension TileDebugger on Tile {
-  debug() {
-    print('>---');
-    if (matchable != null) print('tile match: ${matchable?.match.name}');
-    if (blocker != null) print('tile blocker: ${blocker?.type.name}');
-    if (collectible != null) print('tile collectible: ${collectible?.type.name}');
+  setPositionFromYX(int y, int x) {
+    container.position = Offset(x * TileDimensions.totalWidth, y * TileDimensions.totalHeight);
   }
 }
 
 extension TileExploder on Tile {
   explode() {}
   getExplodingArea() {}
+}
+
+extension TileDebugger on Tile {
+  debug() {
+    print('>---');
+    String coordinates = 'x: ${container.left} y: ${container.top}';
+    if (matchable != null) print('tile match: ${matchable?.match.name} $coordinates');
+    if (blocker != null) print('tile blocker: ${blocker?.type.name} $coordinates');
+    if (collectible != null) print('tile collectible: ${collectible?.type.name} $coordinates');
+  }
 }

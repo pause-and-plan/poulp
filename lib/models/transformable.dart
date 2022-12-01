@@ -4,7 +4,7 @@ class Transformable {
   Transformable(this.size);
 
   // current state
-  Size size = Size.zero;
+  Size size;
   Offset position = Offset.zero;
 
   // transformations
@@ -33,5 +33,21 @@ class Transformable {
   void flatten() {
     position += translate;
     duration = Duration.zero;
+  }
+
+  Offset topCollision() {
+    return Offset(left + (size.width * 0.5), top - (size.height * 0.5));
+  }
+
+  Offset bottomCollision() {
+    return Offset(left + (size.width * 0.5), top + (size.height * 1.5));
+  }
+
+  Offset leftCollision() {
+    return Offset(left - (size.width * 0.5), top + (size.height * 0.5));
+  }
+
+  Offset rightCollision() {
+    return Offset(left + (size.width * 1.5), top + (size.height * 0.5));
   }
 }

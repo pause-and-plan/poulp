@@ -103,16 +103,12 @@ extension TilesMatcher on List<Tile> {
   List<Key> getMatchingTilesKey() {
     var keys = List<Key>.empty(growable: true);
     for (var index = 0; index < length; index++) {
-      // var vertical = _getVerticalMatchingTiles(index);
+      var vertical = _getVerticalMatchingTiles(index);
       var horizontal = _getHorizontalMatchingTiles(index);
-      // if (vertical.length >= 2) keys.addAll(vertical);
+      if (vertical.length >= 2) keys.addAll(vertical);
       if (horizontal.length >= 2) keys.addAll(horizontal);
     }
-    var list = keys.toSet().toList();
-    // print('keys $list ${list.map(
-    //   (e) => firstWhere((element) => element.key == e).matchable!.match.name,
-    // )}');
-    return list;
+    return keys.toSet().toList();
   }
 
   List<Key> _getVerticalMatchingTiles(int index) {

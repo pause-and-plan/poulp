@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 enum Blockers { wrapper, block }
 
 class Blocker {
@@ -7,4 +9,15 @@ class Blocker {
 
   Blockers type;
   int level;
+}
+
+extension BlockerColor on Blocker {
+  Color color() {
+    switch (type) {
+      case Blockers.wrapper:
+        return Colors.pink;
+      case Blockers.block:
+        return Colors.grey;
+    }
+  }
 }

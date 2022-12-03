@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:poulp/ui/board.ui.dart';
-import 'package:poulp/ui/header/header.ui.dart';
 
 class GameUI extends StatefulWidget {
   const GameUI({Key? key, required this.title}) : super(key: key);

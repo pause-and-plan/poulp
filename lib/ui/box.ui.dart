@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:poulp/blocs/board/board.bloc.dart';
-import 'package:poulp/ui/box_content.ui.dart';
+import 'package:poulp/blocs/game/game_bloc.dart';
+import 'package:poulp/models/tile.dart';
+import 'package:poulp/models/matchable.dart';
+import 'package:poulp/singletons/dimensions.dart';
 
 class BoxUI extends StatelessWidget {
   const BoxUI({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<BoardBloc, BoardState, BoxState?>(
+    return BlocSelector<GameBloc, GameState, Tile?>(
       selector: ((state) {
         try {
-          return state.boxes.firstWhere((element) => element.key == key);
+          return state.tiles.firstWhere((element) => element.key == key);
         } catch (error) {
           return null;
         }
@@ -21,17 +23,17 @@ class BoxUI extends StatelessWidget {
           return const SizedBox.shrink();
         }
         return AnimatedScale(
-          scale: state.scale,
-          duration: state.scaleDuration,
+          scale: state.container.scale,
+          duration: state.container.duration,
           child: Container(
             clipBehavior: Clip.none,
-            height: 50,
-            width: 50,
+            height: dimensions.tileHeight.toDouble(),
+            width: dimensions.tileWidth.toDouble(),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
-              color: Colors.white10,
+              color: state.color,
             ),
-            child: BoxContentUI(state.assetPath, key: key),
+            // child: BoxContentUI(state.assetPath, key: key),
           ),
         );
       }),

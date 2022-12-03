@@ -57,6 +57,8 @@ flutter:
     - assets/drop_red.riv
     - assets/drop_green.riv
     - assets/drop_yellow.riv
+    - assets/levels/level_1.json
+    - assets/levels/level_2.json
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
   # For details regarding adding assets from package dependencies, see

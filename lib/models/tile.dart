@@ -25,6 +25,8 @@ class Tile {
   setPositionFromYX(int y, int x) {
     container.position = dimensions.tilePosition(x, y);
   }
+
+  Color? get color => matchable?.color() ?? blocker?.color();
 }
 
 extension TileExploder on Tile {

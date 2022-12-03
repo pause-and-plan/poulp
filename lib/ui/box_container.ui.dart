@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:poulp/blocs/board/board.bloc.dart';
+import 'package:poulp/blocs/game/game_bloc.dart';
+import 'package:poulp/models/tile.dart';
 import 'package:poulp/ui/box.ui.dart';
 
 class BoxContainerUI extends StatelessWidget {
@@ -8,10 +9,10 @@ class BoxContainerUI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<BoardBloc, BoardState, BoxState?>(
+    return BlocSelector<GameBloc, GameState, Tile?>(
       selector: ((state) {
         try {
-          return state.boxes.firstWhere((element) => element.key == key);
+          return state.tiles.firstWhere((element) => element.key == key);
         } catch (error) {
           return null;
         }
@@ -21,9 +22,9 @@ class BoxContainerUI extends StatelessWidget {
           return const SizedBox.shrink();
         }
         return AnimatedPositioned(
-          left: state.left,
-          top: state.top,
-          duration: state.fallDuration,
+          left: state.container.left,
+          top: state.container.top,
+          duration: state.container.duration,
           child: BoxUI(key: key),
         );
       }),

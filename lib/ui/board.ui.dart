@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:poulp/blocs/board/board.bloc.dart';
 import 'package:poulp/blocs/game/game_bloc.dart';
 import 'package:poulp/singletons/dimensions.dart';
 import 'package:poulp/ui/box_container.ui.dart';
@@ -15,7 +14,7 @@ class BoardUI extends StatelessWidget {
     return Container(
       clipBehavior: Clip.hardEdge,
       margin: const EdgeInsets.only(top: 100),
-      padding: const EdgeInsets.all(5),
+      padding: EdgeInsets.all(dimensions.gridPadding),
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), color: const Color(0xFF33588D)),
       width: dimensions.gridWidth,
       height: dimensions.gridHeight,
@@ -26,9 +25,9 @@ class BoardUI extends StatelessWidget {
           //   game.add(TileSwap(start, delta));
           // }
         },
-        child: BlocSelector<BoardBloc, BoardState, List<BoxContainerUI>>(
+        child: BlocSelector<GameBloc, GameState, List<BoxContainerUI>>(
           selector: ((state) {
-            return state.boxes.map((e) => BoxContainerUI(key: e.key)).toList();
+            return state.tiles.map((e) => BoxContainerUI(key: e.key)).toList();
           }),
           builder: ((context, state) {
             return Stack(clipBehavior: Clip.none, children: state);

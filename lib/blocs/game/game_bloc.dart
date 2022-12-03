@@ -11,9 +11,9 @@ part 'game_state.dart';
 
 class GameBloc extends Bloc<GameEvent, GameState> {
   GameBloc(this.levels) : super(GameInitial()) {
-    on<GameStart>((event, emit) {
+    on<GameStart>((event, emit) async {
       history = [];
-      game = Game.fromLevel(levels.getNextIncompleteLevel());
+      game = Game.fromLevel(await levels.getNextIncompleteLevel());
       emit(GameReady(game.level, game.tiles, game.score, game.movesLeft));
     });
 
@@ -40,6 +40,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         emit(GameReady(game.level, game.tiles, game.score, game.movesLeft));
       }
     });
+
+    add(GameStart());
   }
 
   LevelsRepository levels;

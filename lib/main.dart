@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:poulp/blocs/board/board.bloc.dart';
 import 'package:poulp/blocs/game/game_bloc.dart';
 import 'package:poulp/repositories/levels/levels_repository.dart';
 import 'package:poulp/ui/game.ui.dart';

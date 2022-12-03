@@ -2,7 +2,7 @@
 
 [*] Generate grid from json level
 
-[ ] Show grid on the screen
+[*] Show grid on the screen
 
 [ ] Swap tiles
 

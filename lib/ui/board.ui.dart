@@ -16,8 +16,8 @@ class BoardUI extends StatelessWidget {
       margin: const EdgeInsets.only(top: 100),
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), color: const Color(0xFF33588D)),
-      width: BoardDimensions.columns * BoxDimensions.totalWidth + 10,
-      height: BoardDimensions.rows * BoxDimensions.totalHeight + 10,
+      width: gridDimensions.columns * BoxDimensions.totalWidth + 10,
+      height: gridDimensions.rows * BoxDimensions.totalHeight + 10,
       child: GestureDetector(
         onPanStart: (details) {
           board.add(BoxSwapStart(details.localPosition));

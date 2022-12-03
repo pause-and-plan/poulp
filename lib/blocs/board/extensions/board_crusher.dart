@@ -31,7 +31,7 @@ extension BoardCrusher on BoardBloc {
       }
 
       Box box = Box.generate(index);
-      int column = index % BoardDimensions.columns;
+      int column = index % gridDimensions.columns;
       double left = column * BoxDimensions.totalWidth;
       double top = -BoxDimensions.totalHeight * (newBoxes[column].length + 1);
       box.position = Offset(left, top);
@@ -65,7 +65,7 @@ extension BoardCrusher on BoardBloc {
       }
     }
 
-    int column = index % BoardDimensions.columns;
+    int column = index % gridDimensions.columns;
     boxes[column] = Box.generate(column);
     Box newBox = newBoxes[column].first;
     newBoxes[column].removeAt(0);

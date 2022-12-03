@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 class Transformable {
-  Transformable(this.size);
+  Transformable(this.size, this.position, this.scale, this.duration, this.translate);
+  Transformable.fromSize(this.size);
+
+  clone() => Transformable(size, position, scale, duration, translate);
 
   // current state
   Size size;

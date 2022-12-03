@@ -5,8 +5,8 @@ import 'package:poulp/models/box/box.dart';
 
 extension BoardGetter on BoardBloc {
   Box? box(int? index) => boxes.safeElementAt(index);
-  int column(index) => index % BoardDimensions.columns;
-  int row(int index) => index ~/ BoardDimensions.columns;
+  int column(index) => index % gridDimensions.columns;
+  int row(int index) => index ~/ gridDimensions.columns;
 
   int? horizontalBox(int index, {int distance = 1}) {
     if (index < 0 || boxes.length <= index) {
@@ -29,7 +29,7 @@ extension BoardGetter on BoardBloc {
       return null;
     }
 
-    int verticalIndex = index + distance * BoardDimensions.columns;
+    int verticalIndex = index + distance * gridDimensions.columns;
 
     if (verticalIndex < 0 || boxes.length <= verticalIndex) {
       return null;
@@ -54,7 +54,7 @@ extension BoardGetter on BoardBloc {
       return null;
     }
 
-    int distantIndex = index + offset.dx.toInt() + offset.dy.toInt() * BoardDimensions.columns;
+    int distantIndex = index + offset.dx.toInt() + offset.dy.toInt() * gridDimensions.columns;
 
     if (distantIndex < 0 || boxes.length <= distantIndex) {
       return null;

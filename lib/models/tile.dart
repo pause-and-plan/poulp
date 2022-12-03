@@ -14,8 +14,13 @@ class TileDimensions {
 }
 
 class Tile {
+  Tile(this.key, this.matchable, this.blocker, this.collectible, this.container);
+  Tile.empty() : key = UniqueKey();
+
+  Tile clone() => Tile(key, matchable?.clone(), blocker?.clone(), collectible?.clone(), container.clone());
+
   // identifiers
-  final Key key = UniqueKey();
+  final Key key;
 
   // content
   Matchable? matchable;
@@ -23,7 +28,7 @@ class Tile {
   Collectible? collectible;
 
   // transformations
-  Transformable container = Transformable(TileDimensions.size);
+  Transformable container = Transformable.fromSize(TileDimensions.size);
 
   setPositionFromYX(int y, int x) {
     container.position = Offset(x * TileDimensions.totalWidth, y * TileDimensions.totalHeight);

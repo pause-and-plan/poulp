@@ -1,21 +1,24 @@
 import 'package:poulp/helpers/random.dart';
-import 'package:poulp/models/blocker.dart';
-import 'package:poulp/models/collectible.dart';
-import 'package:poulp/models/matchable.dart';
 import 'package:poulp/models/tile.dart';
 import 'package:poulp/models/tiles.dart';
 import 'package:poulp/repositories/levels/level.dart';
 
-// 1. generateFromLevel DONE
-// 2. swapTiles
-// 3. explodingReaction
-// 4. reset
+// [*] Generate grid from json level
+// [ ] Show grid on the screen
+// [ ] Swap tiles
+// [ ] Exploding reaction
+// [ ] Score
+// [ ] Movements
+// [ ] Reset
 
 class Game {
+  Game(this.level, this.tiles, this.score, this.movesLeft);
   Game.fromLevel(this.level) {
     random.init(level.randomSeed);
     tiles.initFromLevel(level);
   }
+
+  Game clone() => Game(level, tiles.clone(), score, movesLeft);
 
   Level level;
   List<Tile> tiles = [];

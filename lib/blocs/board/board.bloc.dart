@@ -12,7 +12,7 @@ part 'board.events.dart';
 part 'board.state.dart';
 part 'box.state.dart';
 
-class BoardDimensions {
+class gridDimensions {
   static int rows = 8;
   static int columns = 7;
   static int get length => rows * columns;
@@ -95,8 +95,8 @@ class BoardBloc extends Bloc<BoardEvent, BoardState> {
   int movesLeft = BoardMoves.initialAmount;
 
   BoardSwapStatus swapStatus = BoardSwapStatus.listening;
-  List<Box> boxes = List.generate(BoardDimensions.length, Box.generate);
-  List<List<Box>> newBoxes = List.generate(BoardDimensions.columns, (_) => List.empty(growable: true));
+  List<Box> boxes = List.generate(gridDimensions.length, Box.generate);
+  List<List<Box>> newBoxes = List.generate(gridDimensions.columns, (_) => List.empty(growable: true));
   List<Box> get allBoxes => [
         ...newBoxes.reduce((value, element) => [...value, ...element]),
         ...boxes,

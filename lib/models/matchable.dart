@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:poulp/helpers/random.dart';
+import 'package:poulp/singletons/random.dart';
 import 'package:poulp/repositories/levels/level.dart';
 
 enum SpecialMatchables { horizontal, vertical, bomb }

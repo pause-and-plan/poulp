@@ -1,13 +1,15 @@
-## ideas
+# TODO
 
-* implement game entities
+[*] Generate grid from json level
 
-- BoardGenerator
+[ ] Show grid on the screen
 
-- BoardSwapper
+[ ] Swap tiles
 
-- BoardCrusher
+[ ] Exploding reaction
 
-- BoardGravitator
+[ ] Score
 
+[ ] Movements
 
+[ ] Reset

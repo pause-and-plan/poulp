@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poulp/blocs/board/board.bloc.dart';
-import 'package:poulp/models/box/box.dart';
+import 'package:poulp/blocs/game/game_bloc.dart';
+import 'package:poulp/singletons/dimensions.dart';
 import 'package:poulp/ui/box_container.ui.dart';
 
 class BoardUI extends StatelessWidget {
@@ -9,24 +10,21 @@ class BoardUI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    BoardBloc board = context.read<BoardBloc>();
+    final game = context.read<GameBloc>();
 
     return Container(
       clipBehavior: Clip.hardEdge,
       margin: const EdgeInsets.only(top: 100),
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), color: const Color(0xFF33588D)),
-      width: gridDimensions.columns * BoxDimensions.totalWidth + 10,
-      height: gridDimensions.rows * BoxDimensions.totalHeight + 10,
+      width: dimensions.gridWidth,
+      height: dimensions.gridHeight,
       child: GestureDetector(
-        onPanStart: (details) {
-          board.add(BoxSwapStart(details.localPosition));
-        },
+        onPanStart: (details) {},
         onPanUpdate: (details) {
-          board.add(BoxSwapUpdate(details.localPosition, details.delta));
-        },
-        onPanEnd: (_) {
-          board.add(BoxSwapEnd());
+          // if (details.delta) {
+          //   game.add(TileSwap(start, delta));
+          // }
         },
         child: BlocSelector<BoardBloc, BoardState, List<BoxContainerUI>>(
           selector: ((state) {

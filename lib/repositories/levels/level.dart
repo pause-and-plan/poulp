@@ -55,8 +55,6 @@ extension TileCodesUtils on TileCodes {
   }
 }
 
-const Size gridDimensions = Size(9, 9);
-
 @JsonSerializable()
 class Level {
   double version = 0.01;

@@ -20,7 +20,7 @@ class _GameUIState extends State<GameUI> {
         width: double.infinity,
         color: Colors.black87,
         child: Column(
-          children: const [HeaderUI(), Center(child: BoardUI())],
+          children: const [Center(child: BoardUI())],
         ),
       ),
     );

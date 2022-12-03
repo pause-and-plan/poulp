@@ -5,6 +5,7 @@ import 'package:poulp/models/matchable.dart';
 import 'package:poulp/models/tile.dart';
 import 'package:poulp/models/transformable.dart';
 import 'package:poulp/repositories/levels/level.dart';
+import 'package:poulp/singletons/dimensions.dart';
 
 extension TilesCloner on List<Tile> {
   List<Tile> clone() => List.from(map((e) => e.clone()).toList());
@@ -16,7 +17,7 @@ extension TilesGenerator on List<Tile> {
   }
 
   _addTileRecursively(Level level, int index) {
-    if (index >= gridDimensions.width * gridDimensions.height) {
+    if (index >= dimensions.cols * dimensions.rows) {
       return true;
     }
     var y = _yFromIndex(index);
@@ -50,8 +51,8 @@ extension TilesGenerator on List<Tile> {
     return false;
   }
 
-  int _xFromIndex(int index) => index % gridDimensions.width.toInt();
-  int _yFromIndex(int index) => (index / gridDimensions.width).floor();
+  int _xFromIndex(int index) => index % dimensions.cols;
+  int _yFromIndex(int index) => (index / dimensions.cols).floor();
   TileCodes _codeFromYX(Level level, int y, int x) => level.tileMap[y][x];
 
   Tile? _codeToTile(Level level, TileCodes code, List<Matchables> options) {

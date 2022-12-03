@@ -3,15 +3,7 @@ import 'package:poulp/models/blocker.dart';
 import 'package:poulp/models/collectible.dart';
 import 'package:poulp/models/matchable.dart';
 import 'package:poulp/models/transformable.dart';
-
-class TileDimensions {
-  static double height = 44;
-  static double width = 40;
-  static double margin = 2;
-  static double get totalHeight => height + margin;
-  static double get totalWidth => width + margin;
-  static Size get size => Size(width, height);
-}
+import 'package:poulp/singletons/dimensions.dart';
 
 class Tile {
   Tile(this.key, this.matchable, this.blocker, this.collectible, this.container);
@@ -28,10 +20,10 @@ class Tile {
   Collectible? collectible;
 
   // transformations
-  Transformable container = Transformable.fromSize(TileDimensions.size);
+  Transformable container = Transformable.fromSize(dimensions.tileSize);
 
   setPositionFromYX(int y, int x) {
-    container.position = Offset(x * TileDimensions.totalWidth, y * TileDimensions.totalHeight);
+    container.position = dimensions.tilePosition(x, y);
   }
 }
 

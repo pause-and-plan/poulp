@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poulp/blocs/board/board.bloc.dart';
+import 'package:poulp/blocs/game/game_bloc.dart';
+import 'package:poulp/repositories/levels/levels_repository.dart';
 import 'package:poulp/ui/game.ui.dart';
 
 void main() {
@@ -19,7 +21,7 @@ class PoulpQuest extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         home: BlocProvider(
-          create: (BuildContext context) => BoardBloc(),
+          create: (BuildContext context) => GameBloc(LevelsRepository()),
           child: const GameUI(title: 'Game'),
         ));
   }

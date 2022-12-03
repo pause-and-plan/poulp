@@ -10,6 +10,8 @@ class BoardUI extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final game = context.read<GameBloc>();
+    Offset start = Offset.zero;
+    bool isSwapEventSent = false;
 
     return Container(
       clipBehavior: Clip.hardEdge,
@@ -19,12 +21,17 @@ class BoardUI extends StatelessWidget {
       width: dimensions.gridWidth,
       height: dimensions.gridHeight,
       child: GestureDetector(
-        onPanStart: (details) {},
+        onPanStart: (details) => start = details.localPosition,
         onPanUpdate: (details) {
-          // if (details.delta) {
-          //   game.add(TileSwap(start, delta));
-          // }
+          if (isSwapEventSent) return;
+
+          Offset delta = details.localPosition - start;
+          if (delta.dx.abs() > 1 || delta.dy.abs() > 1) {
+            isSwapEventSent = true;
+            game.add(TileSwap(start, delta));
+          }
         },
+        onPanEnd: (_) => isSwapEventSent = false,
         child: BlocSelector<GameBloc, GameState, List<BoxContainerUI>>(
           selector: ((state) {
             return state.tiles.map((e) => BoxContainerUI(key: e.key)).toList();

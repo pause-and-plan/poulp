@@ -35,6 +35,7 @@ class Transformable {
 
   void flatten() {
     position += translate;
+    translate = Offset.zero;
     duration = Duration.zero;
   }
 
@@ -52,5 +53,13 @@ class Transformable {
 
   Offset rightCollision() {
     return Offset(left + (size.width * 1.5), top + (size.height * 0.5));
+  }
+
+  Offset sideCollisionFromDelta(Offset delta) {
+    if (delta.dx.abs() > delta.dy.abs()) {
+      return delta.dx.isNegative ? leftCollision() : rightCollision();
+    } else {
+      return delta.dy.isNegative ? topCollision() : bottomCollision();
+    }
   }
 }

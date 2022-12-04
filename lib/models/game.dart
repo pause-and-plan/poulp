@@ -15,14 +15,14 @@ class Game {
   Game clone() => Game(level, tiles.clone(), score, movesLeft);
 
   Level level;
-  List<Tile> tiles = [];
+  Map<Key, Tile> tiles = {};
   int score = 0;
   int movesLeft = 0;
 }
 
 extension TileSwapper on Game {
   getTileByOffset(Offset offset) {
-    return tiles.firstWhere((element) => element.container.isColliding(offset));
+    return tiles.values.firstWhere((element) => element.container.isColliding(offset));
   }
 
   getSideTileByDelta(Tile tile, Offset delta) {
@@ -30,14 +30,45 @@ extension TileSwapper on Game {
     return getTileByOffset(offset);
   }
 
-  swapTiles(Tile from, Tile to) {
+  bool canSwapTiles(Tile from, Tile to) {
+    swapTiles(from, to, Duration.zero);
+    bool containMatch = tiles.containMatch();
+    revertSwap(from, to, Duration.zero);
+    return containMatch;
+  }
+
+  swapTiles(Tile from, Tile to, Duration duration, {double translatePercent = 1}) {
     from.container.transform(
-      translate: to.container.position - from.container.position,
-      duration: swapAnimations.successDuration,
+      translate: (to.container.position - from.container.position) * translatePercent,
+      duration: duration,
     );
     to.container.transform(
-      translate: from.container.position - to.container.position,
-      duration: swapAnimations.successDuration,
+      translate: (from.container.position - to.container.position) * translatePercent,
+      duration: duration,
     );
+  }
+
+  revertSwap(Tile from, Tile to, Duration duration, {double translatePercent = 1}) {
+    from.container.transform(
+      translate: (from.container.position - to.container.position) * translatePercent,
+      duration: duration,
+    );
+    to.container.transform(
+      translate: (to.container.position - from.container.position) * translatePercent,
+      duration: duration,
+    );
+  }
+
+  fakeSwapToShowFailure(Tile from, Tile to, Duration duration) {
+    swapTiles(from, to, duration, translatePercent: 0.4);
+  }
+
+  revertFakeSwap(Tile from, Tile to, Duration duration) {
+    revertSwap(from, to, duration, translatePercent: 0.4);
+  }
+
+  flattenTiles(Tile from, Tile to) {
+    from.container.flatten();
+    to.container.flatten();
   }
 }

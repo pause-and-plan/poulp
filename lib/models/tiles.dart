@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:poulp/models/blocker.dart';
 import 'package:poulp/models/collectible.dart';
 import 'package:poulp/models/matchable.dart';
+import 'package:poulp/models/matching_group.dart';
 import 'package:poulp/models/tile.dart';
 import 'package:poulp/models/transformable.dart';
 import 'package:poulp/repositories/levels/level.dart';
+import 'package:poulp/singletons/animations.dart';
 import 'package:poulp/singletons/dimensions.dart';
 
-extension TilesCloner on List<Tile> {
-  List<Tile> clone() => List.from(map((e) => e.clone()).toList());
+extension TilesHelper on Map<Key, Tile> {
+  Map<Key, Tile> clone() => Map<Key, Tile>.fromEntries(entries.map((e) => MapEntry(e.key, e.value.clone())));
 }
 
-extension TilesGenerator on List<Tile> {
+extension TilesGenerator on Map<Key, Tile> {
   initFromLevel(Level level) {
     _addTileRecursively(level, 0);
   }
@@ -27,7 +29,7 @@ extension TilesGenerator on List<Tile> {
 
     if (!code.isMatchable()) {
       Tile? tile = _codeToTile(level, code, options)?..setPositionFromYX(y, x);
-      if (tile != null) add(tile);
+      if (tile != null) this[tile.key] = tile;
       return _addTileRecursively(level, index + 1);
     }
 
@@ -35,17 +37,17 @@ extension TilesGenerator on List<Tile> {
       Tile tile = _codeToTile(level, code, options)!..setPositionFromYX(y, x);
       options.remove(tile.matchable!.match);
 
-      add(tile);
+      this[tile.key] = tile;
 
       if (containMatch()) {
-        remove(tile);
+        remove(tile.key);
         continue;
       }
 
       var succeed = _addTileRecursively(level, index + 1);
       if (succeed) return succeed;
 
-      remove(tile);
+      remove(tile.key);
     }
 
     return false;
@@ -102,103 +104,160 @@ extension TilesGenerator on List<Tile> {
   }
 }
 
-extension TilesMatcher on List<Tile> {
-  bool containMatch() => getMatchingTilesKey().isNotEmpty;
+extension TilesMatcher on Map<Key, Tile> {
+  bool containMatch() => getMatchingGroups().isNotEmpty;
 
-  List<Key> getMatchingTilesKey() {
-    var keys = List<Key>.empty(growable: true);
-    for (var index = 0; index < length; index++) {
-      var vertical = _getVerticalMatchingTiles(index);
-      var horizontal = _getHorizontalMatchingTiles(index);
-      if (vertical.length >= 2) keys.addAll(vertical);
-      if (horizontal.length >= 2) keys.addAll(horizontal);
-    }
-    return keys.toSet().toList();
+  Map<Key, MatchingGroup> getMatchingGroups() {
+    var allGroups = _getAllMatchingGroups();
+    var filteredGroups = _filterMatchingGroups(allGroups);
+    return filteredGroups;
   }
 
-  List<Key> _getVerticalMatchingTiles(int index) {
-    var keys = List<Key>.empty(growable: true);
-    var match = _tileMatch(index);
+  applyMatchingGroups(Map<Key, MatchingGroup> groups) {
+    groups.values.forEach(_applyMatchingGroup);
+  }
+
+  flatten() {
+    for (var tile in values) {
+      tile.container.flatten();
+    }
+  }
+
+  Map<Key, MatchingGroup> _getAllMatchingGroups() {
+    Map<Key, MatchingGroup> groups = {};
+    for (var key in keys) {
+      var group = MatchingGroup(key, _getVerticalMatchingTiles(key), _getHorizontalMatchingTiles(key));
+      if (group.containMatch) {
+        groups[group.key] = group;
+      }
+    }
+    return groups;
+  }
+
+  Map<Key, MatchingGroup> _filterMatchingGroups(Map<Key, MatchingGroup> groups) {
+    List<Key> checklist = List.from(groups.keys);
+
+    while (checklist.isNotEmpty) {
+      var group = groups[checklist.removeAt(0)];
+      if (group == null) continue;
+      var members = group.members;
+      while (members.isNotEmpty) {
+        var otherGroup = groups[members.removeAt(0)];
+        if (otherGroup == null) continue;
+
+        if (group.isMoreRelevantThanDoublon(this, otherGroup)) {
+          groups.remove(otherGroup.key);
+          checklist.remove(otherGroup.key);
+        } else {
+          groups.remove(group.key);
+          break;
+        }
+      }
+    }
+    return groups;
+  }
+
+  _applyMatchingGroup(MatchingGroup group) {
+    if (group.hasSpecialEffect) {
+      _applySpecialGroupEffect(group);
+    } else {
+      _removeItem(group.key);
+    }
+    group.members.forEach(_removeItem);
+  }
+
+  _removeItem(Key key) {
+    var top = _topTile(key);
+    remove(key);
+
+    while (top != null) {
+      if (this[top]!.blocker != null) break;
+      var container = this[top]!.container;
+      top = _topTile(top);
+      container.transform(translate: fallAnimations.offset, duration: fallAnimations.duration);
+    }
+  }
+
+  _applySpecialGroupEffect(MatchingGroup group) {
+    var matchable = this[group.key]?.matchable;
+    if (matchable == null) return;
+
+    matchable.special = group.getSpecial();
+  }
+
+  List<Key> _getVerticalMatchingTiles(Key key) {
+    var list = List<Key>.empty(growable: true);
+    var match = _tileMatch(key);
 
     if (match == null) {
-      return keys;
+      return list;
     }
 
-    int? top = _topTileIndex(index);
-    int? bottom = _bottomTileIndex(index);
+    Key? top = _topTile(key);
+    Key? bottom = _bottomTile(key);
 
     while (top != null) {
       if (match != _tileMatch(top)) break;
-      keys.add(_tileKey(top));
-      top = _topTileIndex(top);
+      list.add(top);
+      top = _topTile(top);
     }
 
     while (bottom != null) {
       if (match != _tileMatch(bottom)) break;
-      keys.add(_tileKey(bottom));
-      bottom = _bottomTileIndex(bottom);
+      list.add(bottom);
+      bottom = _bottomTile(bottom);
     }
-    return keys;
+
+    return list;
   }
 
-  List<Key> _getHorizontalMatchingTiles(int index) {
-    var keys = List<Key>.empty(growable: true);
-    var match = _tileMatch(index);
+  List<Key> _getHorizontalMatchingTiles(Key key) {
+    var list = List<Key>.empty(growable: true);
+    var match = _tileMatch(key);
 
     if (match == null) {
-      return keys;
+      return list;
     }
 
-    int? left = _leftTileIndex(index);
-    int? right = _rightTileIndex(index);
+    Key? left = _leftTile(key);
+    Key? right = _rightTile(key);
 
     while (left != null) {
       if (match != _tileMatch(left)) break;
-      keys.add(_tileKey(left));
-      left = _leftTileIndex(left);
+      list.add(left);
+      left = _leftTile(left);
     }
 
     while (right != null) {
       if (match != _tileMatch(right)) break;
-      keys.add(_tileKey(right));
-      right = _rightTileIndex(right);
+      list.add(right);
+      right = _rightTile(right);
     }
-    return keys;
+
+    return list;
   }
 
-  int? _topTileIndex(index) {
-    var container = _tileContainer(index);
-    var topIndex = indexWhere((element) => element.container.isColliding(container.topCollision()));
-    return topIndex != -1 ? topIndex : null;
+  Key? _topTile(Key key) => _getTileByOffset(_tileContainer(key)?.topCollision());
+  Key? _bottomTile(Key key) => _getTileByOffset(_tileContainer(key)?.bottomCollision());
+  Key? _leftTile(Key key) => _getTileByOffset(_tileContainer(key)?.leftCollision());
+  Key? _rightTile(Key key) => _getTileByOffset(_tileContainer(key)?.rightCollision());
+  Key? _getTileByOffset(Offset? collision) {
+    try {
+      if (collision == null) throw ErrorDescription('Invalid argument');
+      return values.firstWhere((element) => element.container.isColliding(collision)).key;
+    } catch (_) {
+      return null;
+    }
   }
 
-  int? _bottomTileIndex(index) {
-    var container = _tileContainer(index);
-    var bottomIndex = indexWhere((element) => element.container.isColliding(container.bottomCollision()));
-    return bottomIndex != -1 ? bottomIndex : null;
-  }
-
-  int? _leftTileIndex(index) {
-    var container = _tileContainer(index);
-    var leftIndex = indexWhere((element) => element.container.isColliding(container.leftCollision()));
-    return leftIndex != -1 ? leftIndex : null;
-  }
-
-  int? _rightTileIndex(index) {
-    var container = _tileContainer(index);
-    var rightIndex = indexWhere((element) => element.container.isColliding(container.rightCollision()));
-    return rightIndex != -1 ? rightIndex : null;
-  }
-
-  Matchables? _tileMatch(int index) => this[index].matchable?.match;
-  Transformable _tileContainer(int index) => this[index].container;
-  Key _tileKey(int index) => this[index].key;
+  Matchables? _tileMatch(Key key) => this[key]?.matchable?.match;
+  Transformable? _tileContainer(Key key) => this[key]?.container;
 }
 
-extension TilesDebugger on List<Tile> {
+extension TilesDebugger on Map<Key, Tile> {
   debug() {
     print('Tiles amount $length');
-    for (Tile tile in this) {
+    for (Tile tile in values) {
       tile.debug();
     }
   }

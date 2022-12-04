@@ -27,6 +27,8 @@ class Tile {
   }
 
   Color? get color => matchable?.color() ?? blocker?.color();
+
+  MapEntry<Key, Tile> toMapEntry() => MapEntry(key, this);
 }
 
 extension TileExploder on Tile {

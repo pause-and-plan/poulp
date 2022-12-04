@@ -14,6 +14,7 @@ class Transformable {
   double scale = 1;
   Duration duration = Duration.zero;
   Offset translate = Offset.zero;
+  DateTime modifiedAt = DateTime.now();
 
   // getters
   double get left => position.dx + translate.dx;
@@ -29,8 +30,9 @@ class Transformable {
 
   void transform({Offset? translate, Duration? duration, double? scale}) {
     if (translate != null) this.translate += translate;
-    if (duration != null) this.duration += duration;
+    if (duration != null) this.duration = duration;
     if (scale != null) this.scale += scale;
+    modifiedAt = DateTime.now();
   }
 
   void flatten() {

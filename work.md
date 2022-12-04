@@ -4,9 +4,17 @@
 
 [*] Show grid on the screen
 
-[ ] Swap tiles
+[*] Swap tiles
+
+[ ] Add texture on specials
 
 [ ] Exploding reaction
+    - [*] Basic exploding
+    - [*] Special generation
+    - [*] Gravity effect
+    - [ ] Specials explodings
+    - [ ] Spawner
+    - [ ] Blocker
 
 [ ] Score
 

@@ -3,7 +3,7 @@
   "mode": "score",
   "scoreTargets": [100, 200, 300],
   "randomSeed": 0,
-  "matchables": ["purple", "blue", "green"],
+  "matchables": ["purple", "blue", "green", "yellow", "orange", "red"],
   "tileMap": [
     ["003", "003", "003", "003", "003", "003", "003", "003", "003"],
     ["003", "003", "003", "003", "003", "003", "003", "003", "003"],

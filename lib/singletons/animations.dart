@@ -4,6 +4,7 @@ import 'package:poulp/singletons/dimensions.dart';
 class SwapAnimations {
   Duration successDuration = const Duration(milliseconds: 200);
   Duration failDuration = const Duration(milliseconds: 100);
+  Duration get failTotalDuration => failDuration * 2;
 }
 
 class FallAnimations {

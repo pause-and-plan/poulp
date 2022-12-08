@@ -1,67 +1,82 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-class Transformable {
-  Transformable(this.size, this.position, this.scale, this.duration, this.translate);
-  Transformable.fromSize(this.size);
+class Translation extends Equatable {
+  const Translation.initial()
+      : offset = Offset.zero,
+        duration = Duration.zero,
+        revert = false;
 
-  clone() => Transformable(size, position, scale, duration, translate);
+  const Translation(this.offset, this.duration, {this.revert = false});
 
-  // current state
-  Size size;
-  Offset position = Offset.zero;
+  final Offset offset;
+  final Duration duration;
+  final bool revert;
+
+  @override
+  List<Object> get props => [offset, duration];
+}
+
+class Scale extends Equatable {
+  const Scale.initial()
+      : value = 1,
+        duration = Duration.zero;
+
+  const Scale(this.value, this.duration);
+
+  final double value;
+  final Duration duration;
+
+  @override
+  List<Object> get props => [value, duration];
+}
+
+class Transformable extends Equatable {
+  static Transformable initial() {
+    return Transformable(Rect.zero, DateTime.now());
+  }
+
+  static Transformable fromRect(Rect box) {
+    return Transformable(box, DateTime.now());
+  }
+
+  const Transformable(
+    this.box,
+    this.createdAt, {
+    this.translation = const Translation.initial(),
+    this.scaling = const Scale.initial(),
+  });
+
+  Transformable flatten() => Transformable(box.shift(translation.offset), DateTime.now());
+  Transformable translate(Translation translation) => Transformable(box, DateTime.now(), translation: translation);
+  Transformable scale(Scale scaling) => Transformable(box, DateTime.now(), scaling: scaling);
+
+  final Rect box;
 
   // transformations
-  double scale = 1;
-  Duration duration = Duration.zero;
-  Offset translate = Offset.zero;
-  DateTime modifiedAt = DateTime.now();
+  final Translation translation;
+  final Scale scaling;
+  final DateTime createdAt;
 
   // getters
-  double get left => position.dx + translate.dx;
-  double get top => position.dy + translate.dy;
+  Rect get translationStart => box;
+  Rect get translationEnd => box.shift(translation.offset);
+  double get left => box.shift(translation.offset).left;
+  double get top => box.shift(translation.offset).top;
 
-  bool isColliding(Offset event) {
-    if (event.dx < left) return false;
-    if (event.dx > left + size.width) return false;
-    if (event.dy < top) return false;
-    if (event.dy > top + size.height) return false;
-    return true;
-  }
-
-  void transform({Offset? translate, Duration? duration, double? scale}) {
-    if (translate != null) this.translate += translate;
-    if (duration != null) this.duration = duration;
-    if (scale != null) this.scale += scale;
-    modifiedAt = DateTime.now();
-  }
-
-  void flatten() {
-    position += translate;
-    translate = Offset.zero;
-    duration = Duration.zero;
-  }
-
-  Offset topCollision() {
-    return Offset(left + (size.width * 0.5), top - (size.height * 0.5));
-  }
-
-  Offset bottomCollision() {
-    return Offset(left + (size.width * 0.5), top + (size.height * 1.5));
-  }
-
-  Offset leftCollision() {
-    return Offset(left - (size.width * 0.5), top + (size.height * 0.5));
-  }
-
-  Offset rightCollision() {
-    return Offset(left + (size.width * 1.5), top + (size.height * 0.5));
-  }
+  Offset get leftCollision => box.center.translate(-box.width, 0);
+  Offset get topCollision => box.center.translate(0, -box.height);
+  Offset get rightCollision => box.center.translate(box.width, 0);
+  Offset get bottomCollision => box.center.translate(0, box.height);
 
   Offset sideCollisionFromDelta(Offset delta) {
     if (delta.dx.abs() > delta.dy.abs()) {
-      return delta.dx.isNegative ? leftCollision() : rightCollision();
+      return delta.dx.isNegative ? leftCollision : rightCollision;
     } else {
-      return delta.dy.isNegative ? topCollision() : bottomCollision();
+      return delta.dy.isNegative ? topCollision : bottomCollision;
     }
   }
+
+  @override
+  List<Object> get props => [box, translation, scaling];
 }

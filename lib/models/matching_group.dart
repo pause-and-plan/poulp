@@ -37,7 +37,7 @@ class MatchingGroup {
     if (members.length > otherGroup.members.length) {
       return true;
     }
-    if (tiles[key]!.container.modifiedAt.isAfter(tiles[otherGroup.key]!.container.modifiedAt)) {
+    if (tiles[key]!.container.createdAt.isAfter(tiles[otherGroup.key]!.container.createdAt)) {
       return true;
     }
     return false;

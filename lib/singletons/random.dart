@@ -10,4 +10,4 @@ class RandomGenerator {
   nextInt(int max) => random.nextInt(max);
 }
 
-RandomGenerator random = RandomGenerator();
+RandomGenerator randomProvider = RandomGenerator();

@@ -7,6 +7,7 @@ import 'package:poulp/repositories/levels/level.dart';
 import 'package:poulp/repositories/levels/levels_repository.dart';
 import 'package:poulp/singletons/animations.dart';
 import 'package:poulp/models/tiles.dart';
+import 'package:poulp/ui/box_container.ui.dart';
 
 part 'game_event.dart';
 part 'game_state.dart';
@@ -39,13 +40,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         if (!game.canSwapTiles(from, to)) {
           game.fakeSwapToShowFailure(from, to, swapAnimations.failDuration);
           emit(busyState);
-          await Future.delayed(swapAnimations.failDuration);
-
-          game.revertFakeSwap(from, to, swapAnimations.failDuration);
-          emit(busyState);
-          await Future.delayed(swapAnimations.failDuration);
-
-          game.flattenTiles(from, to);
+          await Future.delayed(swapAnimations.failTotalDuration);
+          game.revertSwap(from, to);
           throw ErrorDescription("Cannot swap tiles");
         }
 
@@ -54,26 +50,18 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         await Future.delayed(swapAnimations.successDuration);
         game.flattenTiles(from, to);
 
-        int cascadeIndex = 0;
-        while (game.tiles.containMatch()) {
-          cascadeIndex++;
-          var groups = game.tiles.getMatchingGroups();
-          game.tiles.applyMatchingGroups(groups);
-          // @TODO Spawn new tiles
-          /**
-           * Check spawner tiles from level
-           * if empty
-           *    - continue to check below until a collision is found
-           *    - save the amount of empty tile in "spawnColumn"
-           *    - generate all tiles and inject them in the UI
-           *    - set the positionY to 0 - spawnColumnIndex * tileHeight
-           *    - set the translationY to spawnColumnIndex * tileHeight
-           *    - 
-           */
-          emit(busyState);
-          await Future.delayed(fallAnimations.duration);
-          game.tiles.flatten();
-        }
+        // int cascadeIndex = 0;
+        // while (game.tiles.containMatch()) {
+        //   // if (game.tiles.containMatch()) {
+        //   cascadeIndex++;
+        //   var groups = game.tiles.getMatchingGroups();
+        //   game.tiles.triggerMatchEffect(groups);
+        //   game.triggerSpawnEffect();
+        //   game.triggerSpawnFallAnimation();
+        //   emit(busyState);
+        //   await Future.delayed(fallAnimations.duration);
+        //   game.tiles.flatten();
+        // }
 
         history.add(game.clone());
         emit(readyState);
@@ -94,8 +82,20 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     add(GameStart());
   }
 
-  GameState get readyState => GameReady(game.level, game.tiles.values.toList(), game.score, game.movesLeft);
-  GameState get busyState => GameBusy(game.level, game.tiles.values.toList(), game.score, game.movesLeft);
+  GameState get readyState => GameReady(
+        game.level,
+        game.getAllTiles(),
+        game.getAllTiles().keys.map((key) => BoxContainerUI(key: key)).toList(),
+        game.score,
+        game.movesLeft,
+      );
+  GameState get busyState => GameBusy(
+        game.level,
+        game.getAllTiles(),
+        game.getAllTiles().keys.map((key) => BoxContainerUI(key: key)).toList(),
+        game.score,
+        game.movesLeft,
+      );
 
   LevelsRepository levels;
   late List<Game> history;

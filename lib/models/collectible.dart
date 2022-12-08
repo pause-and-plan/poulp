@@ -1,9 +1,12 @@
+import 'package:equatable/equatable.dart';
+
 enum Collectibles { cherry }
 
-class Collectible {
-  Collectible(this.type);
+class Collectible extends Equatable {
+  const Collectible(this.type);
 
-  Collectible clone() => Collectible(type);
+  final Collectibles type;
 
-  Collectibles type;
+  @override
+  List<Object> get props => [type];
 }

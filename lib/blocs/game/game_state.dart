@@ -3,11 +3,12 @@ part of 'game_bloc.dart';
 enum GameStatus { initial, ready, busy }
 
 abstract class GameState extends Equatable {
-  const GameState(this.status, this.level, this.tiles, this.score, this.movesLeft);
+  const GameState(this.status, this.level, this.tiles, this.tileContainers, this.score, this.movesLeft);
 
   final GameStatus status;
   final Level? level;
-  final List<Tile> tiles;
+  final Map<Key, Tile> tiles;
+  final List<Widget> tileContainers;
   final int score;
   final int movesLeft;
 
@@ -16,15 +17,15 @@ abstract class GameState extends Equatable {
 }
 
 class GameInitial extends GameState {
-  GameInitial() : super(GameStatus.initial, null, [], 0, 0);
+  GameInitial() : super(GameStatus.initial, null, {}, [], 0, 0);
 }
 
 class GameReady extends GameState {
-  const GameReady(Level level, List<Tile> tiles, int score, int movesLeft)
-      : super(GameStatus.ready, level, tiles, score, movesLeft);
+  const GameReady(Level level, Map<Key, Tile> tiles, List<Widget> tileContainers, int score, int movesLeft)
+      : super(GameStatus.ready, level, tiles, tileContainers, score, movesLeft);
 }
 
 class GameBusy extends GameState {
-  const GameBusy(Level level, List<Tile> tiles, int score, int movesLeft)
-      : super(GameStatus.busy, level, tiles, score, movesLeft);
+  const GameBusy(Level level, Map<Key, Tile> tiles, List<Widget> tileContainers, int score, int movesLeft)
+      : super(GameStatus.busy, level, tiles, tileContainers, score, movesLeft);
 }

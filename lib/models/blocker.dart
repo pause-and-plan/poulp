@@ -1,14 +1,16 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 enum Blockers { wrapper, block }
 
-class Blocker {
-  Blocker(this.type, {this.level = 0});
+class Blocker extends Equatable {
+  const Blocker(this.type, {this.level = 0});
 
-  Blocker clone() => Blocker(type, level: level);
+  final Blockers type;
+  final int level;
 
-  Blockers type;
-  int level;
+  @override
+  List<Object> get props => [type, level];
 }
 
 extension BlockerColor on Blocker {

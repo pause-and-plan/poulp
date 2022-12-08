@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:poulp/models/blocker.dart';
 import 'package:poulp/models/collectible.dart';
@@ -9,13 +11,13 @@ import 'package:poulp/repositories/levels/level.dart';
 import 'package:poulp/singletons/animations.dart';
 import 'package:poulp/singletons/dimensions.dart';
 
-extension TilesHelper on Map<Key, Tile> {
-  Map<Key, Tile> clone() => Map<Key, Tile>.fromEntries(entries.map((e) => MapEntry(e.key, e.value.clone())));
-}
+extension TilesHelper on Map<Key, Tile> {}
 
 extension TilesGenerator on Map<Key, Tile> {
-  initFromLevel(Level level) {
-    _addTileRecursively(level, 0);
+  static Map<Key, Tile> initFromLevel(Level level) {
+    Map<Key, Tile> map = {};
+    map._addTileRecursively(level, 0);
+    return map;
   }
 
   _addTileRecursively(Level level, int index) {
@@ -28,13 +30,13 @@ extension TilesGenerator on Map<Key, Tile> {
     var options = [...level.matchables];
 
     if (!code.isMatchable()) {
-      Tile? tile = _codeToTile(level, code, options)?..setPositionFromYX(y, x);
-      if (tile != null) this[tile.key] = tile;
+      Tile tile = _codeToTile(level, Point(x, y), options);
+      this[tile.key] = tile;
       return _addTileRecursively(level, index + 1);
     }
 
     while (options.isNotEmpty) {
-      Tile tile = _codeToTile(level, code, options)!..setPositionFromYX(y, x);
+      Tile tile = _codeToTile(level, Point(x, y), options);
       options.remove(tile.matchable!.match);
 
       this[tile.key] = tile;
@@ -57,50 +59,34 @@ extension TilesGenerator on Map<Key, Tile> {
   int _yFromIndex(int index) => (index / dimensions.cols).floor();
   TileCodes _codeFromYX(Level level, int y, int x) => level.tileMap[y][x];
 
-  Tile? _codeToTile(Level level, TileCodes code, List<Matchables> options) {
-    Tile tile = Tile.empty();
-
-    switch (code) {
+  Tile _codeToTile(Level level, Point<int> coordinate, List<Matchables> options) {
+    switch (level.tileMap[coordinate.y][coordinate.x]) {
       case TileCodes.matchable:
-        tile.matchable = Matchable.random(from: options);
-        break;
+      case TileCodes.matchableSpawner:
+        return Tile.spawnAt(coordinate, matchables: options);
       case TileCodes.matchableHorizontal:
-        tile.matchable = Matchable.random(from: options, special: SpecialMatchables.horizontal);
-        break;
+        return Tile.spawnAt(coordinate, matchables: options, special: SpecialMatchables.horizontal);
       case TileCodes.matchableVertical:
-        tile.matchable = Matchable.random(from: options, special: SpecialMatchables.vertical);
-        break;
+        return Tile.spawnAt(coordinate, matchables: options, special: SpecialMatchables.vertical);
       case TileCodes.matchableBomb:
-        tile.matchable = Matchable.random(from: options, special: SpecialMatchables.bomb);
-        break;
+        return Tile.spawnAt(coordinate, matchables: options, special: SpecialMatchables.bomb);
       case TileCodes.wrapperLevel1:
-        tile.matchable = Matchable.random(from: options);
-        tile.blocker = Blocker(Blockers.wrapper, level: 0);
-        break;
+        return Tile.spawnAt(coordinate, matchables: options, blocker: const Blocker(Blockers.wrapper, level: 0));
       case TileCodes.wrapperLevel2:
-        tile.matchable = Matchable.random(from: options);
-        tile.blocker = Blocker(Blockers.wrapper, level: 1);
-        break;
+        return Tile.spawnAt(coordinate, matchables: options, blocker: const Blocker(Blockers.wrapper, level: 1));
       case TileCodes.wrapperLevel3:
-        tile.matchable = Matchable.random(from: options);
-        tile.blocker = Blocker(Blockers.wrapper, level: 2);
-        break;
+        return Tile.spawnAt(coordinate, matchables: options, blocker: const Blocker(Blockers.wrapper, level: 2));
       case TileCodes.blockerLevel1:
-        tile.blocker = Blocker(Blockers.block, level: 0);
-        break;
+        return Tile.spawnAt(coordinate, blocker: const Blocker(Blockers.block, level: 0));
       case TileCodes.blockerLevel2:
-        tile.blocker = Blocker(Blockers.block, level: 1);
-        break;
+        return Tile.spawnAt(coordinate, blocker: const Blocker(Blockers.block, level: 1));
       case TileCodes.blockerLevel3:
-        tile.blocker = Blocker(Blockers.block, level: 2);
-        break;
+        return Tile.spawnAt(coordinate, blocker: const Blocker(Blockers.block, level: 2));
       case TileCodes.collectible:
-        tile.collectible = Collectible(Collectibles.cherry);
-        break;
+        return Tile.spawnAt(coordinate, collectible: const Collectible(Collectibles.cherry));
       default:
-        return null;
+        throw ErrorDescription("Unhandled TilesCode detected ${level.tileMap[coordinate.y][coordinate.x]}");
     }
-    return tile;
   }
 }
 
@@ -108,18 +94,20 @@ extension TilesMatcher on Map<Key, Tile> {
   bool containMatch() => getMatchingGroups().isNotEmpty;
 
   Map<Key, MatchingGroup> getMatchingGroups() {
+    print('getMatchingGroups');
+    // print('allGroups ${allGroups.entries.length}');
     var allGroups = _getAllMatchingGroups();
     var filteredGroups = _filterMatchingGroups(allGroups);
     return filteredGroups;
   }
 
-  applyMatchingGroups(Map<Key, MatchingGroup> groups) {
+  triggerMatchEffect(Map<Key, MatchingGroup> groups) {
     groups.values.forEach(_applyMatchingGroup);
   }
 
   flatten() {
     for (var tile in values) {
-      tile.container.flatten();
+      this[tile.key] = tile.clone(container: tile.container.flatten());
     }
   }
 
@@ -172,17 +160,18 @@ extension TilesMatcher on Map<Key, Tile> {
 
     while (top != null) {
       if (this[top]!.blocker != null) break;
-      var container = this[top]!.container;
+      var fallingTile = this[top]!;
       top = _topTile(top);
-      container.transform(translate: fallAnimations.offset, duration: fallAnimations.duration);
+      var fall = Translation(fallAnimations.offset, fallAnimations.duration);
+      this[fallingTile.key] = fallingTile.clone(container: fallingTile.container.translate(fall));
     }
   }
 
   _applySpecialGroupEffect(MatchingGroup group) {
-    var matchable = this[group.key]?.matchable;
-    if (matchable == null) return;
+    var tile = this[group.key];
+    if (tile == null) return;
 
-    matchable.special = group.getSpecial();
+    this[tile.key] = tile.clone(matchable: tile.matchable?.clone(special: group.getSpecial()));
   }
 
   List<Key> _getVerticalMatchingTiles(Key key) {
@@ -237,14 +226,14 @@ extension TilesMatcher on Map<Key, Tile> {
     return list;
   }
 
-  Key? _topTile(Key key) => _getTileByOffset(_tileContainer(key)?.topCollision());
-  Key? _bottomTile(Key key) => _getTileByOffset(_tileContainer(key)?.bottomCollision());
-  Key? _leftTile(Key key) => _getTileByOffset(_tileContainer(key)?.leftCollision());
-  Key? _rightTile(Key key) => _getTileByOffset(_tileContainer(key)?.rightCollision());
+  Key? _topTile(Key key) => _getTileByOffset(_tileContainer(key)?.topCollision);
+  Key? _bottomTile(Key key) => _getTileByOffset(_tileContainer(key)?.bottomCollision);
+  Key? _leftTile(Key key) => _getTileByOffset(_tileContainer(key)?.leftCollision);
+  Key? _rightTile(Key key) => _getTileByOffset(_tileContainer(key)?.rightCollision);
   Key? _getTileByOffset(Offset? collision) {
     try {
       if (collision == null) throw ErrorDescription('Invalid argument');
-      return values.firstWhere((element) => element.container.isColliding(collision)).key;
+      return values.firstWhere((element) => element.container.box.contains(collision)).key;
     } catch (_) {
       return null;
     }

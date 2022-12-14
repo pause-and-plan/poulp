@@ -37,10 +37,6 @@ class Tile extends Equatable {
     );
   }
 
-  // Tile fill() {
-  //   return Tile(key, matchable, blocker, collectible, container);
-  // }
-
   // identifiers
   final Key key;
 
@@ -57,7 +53,7 @@ class Tile extends Equatable {
 }
 
 extension TileHelper on Tile {
-  Color? get color => matchable?.color() ?? blocker?.color();
+  Gradient? get gradient => matchable?.gradient() ?? blocker?.gradient();
 
   MapEntry<Key, Tile> toMapEntry() => MapEntry(key, this);
 }

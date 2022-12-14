@@ -14,12 +14,12 @@ class Blocker extends Equatable {
 }
 
 extension BlockerColor on Blocker {
-  Color color() {
+  Gradient gradient() {
     switch (type) {
       case Blockers.wrapper:
-        return Colors.pink;
+        return const LinearGradient(colors: [Colors.pink, Colors.pink]);
       case Blockers.block:
-        return Colors.grey;
+        return const LinearGradient(colors: [Colors.grey, Colors.grey]);
     }
   }
 }

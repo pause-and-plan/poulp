@@ -8,10 +8,19 @@ import 'package:poulp/models/matching_group.dart';
 import 'package:poulp/models/tile.dart';
 import 'package:poulp/models/transformable.dart';
 import 'package:poulp/repositories/levels/level.dart';
-import 'package:poulp/singletons/animations.dart';
 import 'package:poulp/singletons/dimensions.dart';
 
-extension TilesHelper on Map<Key, Tile> {}
+extension TilesHelper on Map<Key, Tile> {
+  List<Key> above(Offset offset) {
+    return keys.where((key) => this[key]!.container.isAbove(offset)).toList();
+  }
+
+  flatten() {
+    for (var tile in values) {
+      this[tile.key] = tile.clone(container: tile.container.flatten());
+    }
+  }
+}
 
 extension TilesGenerator on Map<Key, Tile> {
   static Map<Key, Tile> initFromLevel(Level level) {
@@ -90,105 +99,62 @@ extension TilesGenerator on Map<Key, Tile> {
   }
 }
 
-extension TilesMatcher on Map<Key, Tile> {
-  bool containMatch() => getMatchingGroups().isNotEmpty;
+extension GroupsExtractorHelper on Map<Key, Tile> {
+  bool containMatch() {
+    var rows = extractHorizontalGroups();
+    if (rows.isNotEmpty) return true;
 
-  Map<Key, MatchingGroup> getMatchingGroups() {
-    print('getMatchingGroups');
-    // print('allGroups ${allGroups.entries.length}');
-    var allGroups = _getAllMatchingGroups();
-    var filteredGroups = _filterMatchingGroups(allGroups);
-    return filteredGroups;
+    var columns = extractVerticalGroups();
+    if (columns.isNotEmpty) return true;
+
+    return false;
   }
 
-  triggerMatchEffect(Map<Key, MatchingGroup> groups) {
-    groups.values.forEach(_applyMatchingGroup);
-  }
-
-  flatten() {
-    for (var tile in values) {
-      this[tile.key] = tile.clone(container: tile.container.flatten());
-    }
-  }
-
-  Map<Key, MatchingGroup> _getAllMatchingGroups() {
-    Map<Key, MatchingGroup> groups = {};
+  List<MatchingGroup> extractHorizontalGroups() {
+    List<MatchingGroup> result = [];
+    List<Key> toSkip = [];
     for (var key in keys) {
-      var group = MatchingGroup(key, _getVerticalMatchingTiles(key), _getHorizontalMatchingTiles(key));
-      if (group.containMatch) {
-        groups[group.key] = group;
+      if (toSkip.contains(key)) continue;
+
+      var members = getHorizontalMatchingTiles(key);
+      if (members != null) {
+        result.add(MatchingGroup.horizontal(members));
+        toSkip.addAll(members);
       }
     }
-    return groups;
+    return result;
   }
 
-  Map<Key, MatchingGroup> _filterMatchingGroups(Map<Key, MatchingGroup> groups) {
-    List<Key> checklist = List.from(groups.keys);
+  List<MatchingGroup> extractVerticalGroups() {
+    List<MatchingGroup> result = [];
+    List<Key> toSkip = [];
+    for (var key in keys) {
+      if (toSkip.contains(key)) continue;
 
-    while (checklist.isNotEmpty) {
-      var group = groups[checklist.removeAt(0)];
-      if (group == null) continue;
-      var members = group.members;
-      while (members.isNotEmpty) {
-        var otherGroup = groups[members.removeAt(0)];
-        if (otherGroup == null) continue;
-
-        if (group.isMoreRelevantThanDoublon(this, otherGroup)) {
-          groups.remove(otherGroup.key);
-          checklist.remove(otherGroup.key);
-        } else {
-          groups.remove(group.key);
-          break;
-        }
+      var members = getVerticalMatchingTiles(key);
+      if (members != null) {
+        result.add(MatchingGroup.vertical(members));
+        toSkip.addAll(members);
       }
     }
-    return groups;
+    return result;
   }
 
-  _applyMatchingGroup(MatchingGroup group) {
-    if (group.hasSpecialEffect) {
-      _applySpecialGroupEffect(group);
-    } else {
-      _removeItem(group.key);
-    }
-    group.members.forEach(_removeItem);
-  }
-
-  _removeItem(Key key) {
-    var top = _topTile(key);
-    remove(key);
-
-    while (top != null) {
-      if (this[top]!.blocker != null) break;
-      var fallingTile = this[top]!;
-      top = _topTile(top);
-      var fall = Translation(fallAnimations.offset, fallAnimations.duration);
-      this[fallingTile.key] = fallingTile.clone(container: fallingTile.container.translate(fall));
-    }
-  }
-
-  _applySpecialGroupEffect(MatchingGroup group) {
-    var tile = this[group.key];
-    if (tile == null) return;
-
-    this[tile.key] = tile.clone(matchable: tile.matchable?.clone(special: group.getSpecial()));
-  }
-
-  List<Key> _getVerticalMatchingTiles(Key key) {
-    var list = List<Key>.empty(growable: true);
+  List<Key>? getVerticalMatchingTiles(Key key) {
+    List<Key> list = [key];
     var match = _tileMatch(key);
 
     if (match == null) {
       return list;
     }
 
-    Key? top = _topTile(key);
+    Key? top = topTile(key);
     Key? bottom = _bottomTile(key);
 
     while (top != null) {
       if (match != _tileMatch(top)) break;
       list.add(top);
-      top = _topTile(top);
+      top = topTile(top);
     }
 
     while (bottom != null) {
@@ -197,11 +163,12 @@ extension TilesMatcher on Map<Key, Tile> {
       bottom = _bottomTile(bottom);
     }
 
-    return list;
+    if (list.length >= 3) return list;
+    return null;
   }
 
-  List<Key> _getHorizontalMatchingTiles(Key key) {
-    var list = List<Key>.empty(growable: true);
+  List<Key>? getHorizontalMatchingTiles(Key key) {
+    List<Key> list = [key];
     var match = _tileMatch(key);
 
     if (match == null) {
@@ -223,17 +190,18 @@ extension TilesMatcher on Map<Key, Tile> {
       right = _rightTile(right);
     }
 
-    return list;
+    if (list.length >= 3) return list;
+    return null;
   }
 
-  Key? _topTile(Key key) => _getTileByOffset(_tileContainer(key)?.topCollision);
-  Key? _bottomTile(Key key) => _getTileByOffset(_tileContainer(key)?.bottomCollision);
-  Key? _leftTile(Key key) => _getTileByOffset(_tileContainer(key)?.leftCollision);
-  Key? _rightTile(Key key) => _getTileByOffset(_tileContainer(key)?.rightCollision);
-  Key? _getTileByOffset(Offset? collision) {
+  Key? topTile(Key key) => getTileByOffset(_tileContainer(key)?.topCollision);
+  Key? _bottomTile(Key key) => getTileByOffset(_tileContainer(key)?.bottomCollision);
+  Key? _leftTile(Key key) => getTileByOffset(_tileContainer(key)?.leftCollision);
+  Key? _rightTile(Key key) => getTileByOffset(_tileContainer(key)?.rightCollision);
+  Key? getTileByOffset(Offset? collision) {
     try {
       if (collision == null) throw ErrorDescription('Invalid argument');
-      return values.firstWhere((element) => element.container.box.contains(collision)).key;
+      return values.firstWhere((e) => e.container.contains(collision)).key;
     } catch (_) {
       return null;
     }

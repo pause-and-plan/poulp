@@ -48,20 +48,24 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         game.swapTiles(from, to, swapAnimations.successDuration);
         emit(busyState);
         await Future.delayed(swapAnimations.successDuration);
-        game.flattenTiles(from, to);
+        game.tiles.flatten();
 
-        // int cascadeIndex = 0;
-        // while (game.tiles.containMatch()) {
-        //   // if (game.tiles.containMatch()) {
-        //   cascadeIndex++;
-        //   var groups = game.tiles.getMatchingGroups();
-        //   game.tiles.triggerMatchEffect(groups);
-        //   game.triggerSpawnEffect();
-        //   game.triggerSpawnFallAnimation();
-        //   emit(busyState);
-        //   await Future.delayed(fallAnimations.duration);
-        //   game.tiles.flatten();
-        // }
+        int cascadeIndex = 0;
+        while (game.tiles.containMatch()) {
+          cascadeIndex++;
+          explodingTiles = game.explodeTiles();
+          game.triggerExplodingAnimation(explodingTiles);
+          emit(busyState);
+          await Future.delayed(explodeAnimations.duration);
+
+          var fallDuration = game.triggerFallingAnimation(explodingTiles);
+          var spawns = game.spawnTiles();
+          game.triggerSpawnFallAnimation(spawns);
+          explodingTiles.clear();
+          emit(busyState);
+          await Future.delayed(fallDuration + const Duration(milliseconds: 0));
+          game.tiles.flatten();
+        }
 
         history.add(game.clone());
         emit(readyState);
@@ -84,15 +88,13 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
   GameState get readyState => GameReady(
         game.level,
-        game.getAllTiles(),
-        game.getAllTiles().keys.map((key) => BoxContainerUI(key: key)).toList(),
+        Map.from(game.tiles)..addAll(explodingTiles),
         game.score,
         game.movesLeft,
       );
   GameState get busyState => GameBusy(
         game.level,
-        game.getAllTiles(),
-        game.getAllTiles().keys.map((key) => BoxContainerUI(key: key)).toList(),
+        Map.from(game.tiles)..addAll(explodingTiles),
         game.score,
         game.movesLeft,
       );
@@ -100,4 +102,5 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   LevelsRepository levels;
   late List<Game> history;
   late Game game;
+  Map<Key, Tile> explodingTiles = {};
 }

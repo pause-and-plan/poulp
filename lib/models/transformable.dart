@@ -13,6 +13,10 @@ class Translation extends Equatable {
   final Duration duration;
   final bool revert;
 
+  Translation operator +(Translation translation) {
+    return Translation(offset + translation.offset, duration + translation.duration, revert: revert);
+  }
+
   @override
   List<Object> get props => [offset, duration];
 }
@@ -47,7 +51,7 @@ class Transformable extends Equatable {
     this.scaling = const Scale.initial(),
   });
 
-  Transformable flatten() => Transformable(box.shift(translation.offset), DateTime.now());
+  Transformable flatten() => Transformable(translatedBox, DateTime.now());
   Transformable translate(Translation translation) => Transformable(box, DateTime.now(), translation: translation);
   Transformable scale(Scale scaling) => Transformable(box, DateTime.now(), scaling: scaling);
 
@@ -59,15 +63,25 @@ class Transformable extends Equatable {
   final DateTime createdAt;
 
   // getters
-  Rect get translationStart => box;
-  Rect get translationEnd => box.shift(translation.offset);
+  Rect get translatedBox => box.shift(translation.offset);
   double get left => box.shift(translation.offset).left;
   double get top => box.shift(translation.offset).top;
 
-  Offset get leftCollision => box.center.translate(-box.width, 0);
-  Offset get topCollision => box.center.translate(0, -box.height);
-  Offset get rightCollision => box.center.translate(box.width, 0);
-  Offset get bottomCollision => box.center.translate(0, box.height);
+  Offset get leftCollision => translatedBox.center.translate(-box.width, 0);
+  Offset get topCollision => translatedBox.center.translate(0, -box.height);
+  Offset get rightCollision => translatedBox.center.translate(box.width, 0);
+  Offset get bottomCollision => translatedBox.center.translate(0, box.height);
+
+  bool contains(Offset offset) => translatedBox.contains(offset);
+  bool isAbove(Offset offset) {
+    if (offset.dy < translatedBox.top) {
+      return false;
+    }
+    if (offset.dx < translatedBox.left || translatedBox.right < offset.dx) {
+      return false;
+    }
+    return true;
+  }
 
   Offset sideCollisionFromDelta(Offset delta) {
     if (delta.dx.abs() > delta.dy.abs()) {

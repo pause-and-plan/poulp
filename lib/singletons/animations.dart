@@ -8,9 +8,15 @@ class SwapAnimations {
 }
 
 class FallAnimations {
-  Duration duration = const Duration(milliseconds: 300);
+  Duration duration = const Duration(milliseconds: 140);
   Offset get offset => Offset(0, (dimensions.tileHeight + dimensions.tileMargin).toDouble());
+}
+
+class ExplodeAnimations {
+  Duration duration = const Duration(milliseconds: 200);
+  double scale = 0.1;
 }
 
 SwapAnimations swapAnimations = SwapAnimations();
 FallAnimations fallAnimations = FallAnimations();
+ExplodeAnimations explodeAnimations = ExplodeAnimations();

@@ -13,6 +13,6 @@ void main() {
     final levels = LevelsRepository();
     final level = levels.get(level1);
     final game = Game.fromLevel(level);
-    game.tiles.debug();
+    // game.tiles.debug();
   });
 }

@@ -26,7 +26,7 @@ class BoxUI extends StatelessWidget {
             width: dimensions.tileWidth.toDouble(),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
-              color: state.color,
+              gradient: state.gradient,
             ),
           ),
         );

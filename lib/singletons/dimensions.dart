@@ -13,8 +13,8 @@ class Dimensions {
   Rect tileContainer(Point<int> coordinate) => Rect.fromLTWH(
         tilePositionX(coordinate.x),
         tilePositionY(coordinate.y),
-        tileWidth.toDouble(),
-        tileHeight.toDouble(),
+        tileTranslationX,
+        tileTranslationY,
       );
   Size get tileSize => Size(tileWidth.toDouble(), tileHeight.toDouble());
   double get tileTranslationX => (tileWidth + tileMargin).toDouble();

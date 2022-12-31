@@ -18,26 +18,38 @@ enum TileCodes {
   @JsonValue('003')
   matchable,
   @JsonValue('004')
-  matchableSpawner,
+  matchablePurple,
   @JsonValue('005')
-  matchableHorizontal,
+  matchableBlue,
   @JsonValue('006')
-  matchableVertical,
+  matchableGreen,
   @JsonValue('007')
-  matchableBomb,
+  matchableYellow,
   @JsonValue('008')
-  blockerLevel1,
+  matchableOrange,
   @JsonValue('009')
-  blockerLevel2,
+  matchableRed,
   @JsonValue('010')
-  blockerLevel3,
+  matchableSpawner,
   @JsonValue('011')
-  wrapperLevel1,
+  matchableHorizontal,
   @JsonValue('012')
-  wrapperLevel2,
+  matchableVertical,
   @JsonValue('013')
-  wrapperLevel3,
+  matchableBomb,
   @JsonValue('014')
+  blockerLevel1,
+  @JsonValue('015')
+  blockerLevel2,
+  @JsonValue('016')
+  blockerLevel3,
+  @JsonValue('017')
+  wrapperLevel1,
+  @JsonValue('018')
+  wrapperLevel2,
+  @JsonValue('019')
+  wrapperLevel3,
+  @JsonValue('020')
   collectible,
 }
 
@@ -45,6 +57,12 @@ extension TileCodesUtils on TileCodes {
   bool isMatchable() {
     switch (this) {
       case TileCodes.matchable:
+      case TileCodes.matchablePurple:
+      case TileCodes.matchableBlue:
+      case TileCodes.matchableGreen:
+      case TileCodes.matchableYellow:
+      case TileCodes.matchableOrange:
+      case TileCodes.matchableRed:
       case TileCodes.matchableSpawner:
       case TileCodes.matchableHorizontal:
       case TileCodes.matchableVertical:
@@ -52,6 +70,20 @@ extension TileCodesUtils on TileCodes {
       case TileCodes.wrapperLevel1:
       case TileCodes.wrapperLevel2:
       case TileCodes.wrapperLevel3:
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  bool isDefinedMatchable() {
+    switch (this) {
+      case TileCodes.matchablePurple:
+      case TileCodes.matchableBlue:
+      case TileCodes.matchableGreen:
+      case TileCodes.matchableYellow:
+      case TileCodes.matchableOrange:
+      case TileCodes.matchableRed:
         return true;
       default:
         return false;

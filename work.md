@@ -8,7 +8,7 @@
 
 [*] Add texture on specials
 
-[ ] Add tile codes to generate specific matchables
+[*] Add tile codes to generate specific matchables
 
 [ ] Exploding reaction
     - [*] Basic exploding

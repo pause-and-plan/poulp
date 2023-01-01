@@ -2,18 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:poulp/singletons/dimensions.dart';
 
 class SwapAnimations {
-  Duration successDuration = const Duration(milliseconds: 200);
-  Duration failDuration = const Duration(milliseconds: 100);
-  Duration get failTotalDuration => failDuration * 2;
+  static const Duration successDuration = Duration(milliseconds: 200);
+  static const Duration failDuration = Duration(milliseconds: 200);
 }
 
 class FallAnimations {
-  Duration duration = const Duration(milliseconds: 140);
+  static const Duration duration = Duration(milliseconds: 140);
   Offset get offset => Offset(0, (dimensions.tileHeight + dimensions.tileMargin).toDouble());
 }
 
 class ExplodeAnimations {
-  Duration duration = const Duration(milliseconds: 200);
+  static const Duration duration = Duration(milliseconds: 200);
   double scale = 0.1;
 }
 

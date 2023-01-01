@@ -1,12 +1,18 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poulp/blocs/game/game_bloc.dart';
+import 'package:poulp/models/grid/grid.dart';
+import 'package:poulp/models/grid/transformation.dart';
 import 'package:poulp/models/transformable.dart';
 import 'package:poulp/singletons/dimensions.dart';
 import 'package:poulp/ui/box.ui.dart';
 
 class BoxContainerUI extends StatefulWidget {
-  const BoxContainerUI({super.key});
+  const BoxContainerUI({super.key, required this.coordinates});
+
+  final Point<int> coordinates;
 
   @override
   State<BoxContainerUI> createState() => _BoxContainerUIState();
@@ -23,32 +29,55 @@ class _BoxContainerUIState extends State<BoxContainerUI> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<GameBloc, GameState, Transformable?>(
-      selector: ((state) {
-        return state.tiles[widget.key]?.container;
-      }),
-      builder: ((context, container) {
-        if (container == null) {
-          return const SizedBox.shrink();
-        }
+    return BlocBuilder<GameBloc, GameState>(
+      buildWhen: (previous, current) {
+        Key? tileKey = current.grid.getTile(widget.coordinates);
+        Key? previousTile = previous.grid.getTile(widget.coordinates);
+        Key? currentTile = current.grid.getTile(widget.coordinates);
+        bool hasChanged = previousTile != currentTile;
+        print('${widget.coordinates} [previous $previousTile current $currentTile] hasChanged $hasChanged');
+        return hasChanged || current.transformations[tileKey] != null;
+      },
+      builder: ((context, state) {
+        final game = context.read<GameBloc>();
+        Key? tileKey = state.grid.getTile(widget.coordinates);
+        print('$tileKey ${widget.coordinates}');
 
-        if (container.translation.offset != Offset.zero) {
+        var transformation = state.transformations[tileKey];
+        var translation = transformation?.translation ?? const Point(0, 0);
+
+        Rect begin = Rect.fromLTWH(
+          widget.coordinates.x * dimensions.tileTranslationX,
+          widget.coordinates.y * dimensions.tileTranslationY,
+          dimensions.tileTranslationX + 2,
+          dimensions.tileTranslationY + 2,
+        );
+        Rect end = Rect.fromLTWH(
+          (widget.coordinates.x + translation.x) * dimensions.tileTranslationX,
+          (widget.coordinates.y + translation.y) * dimensions.tileTranslationY,
+          dimensions.tileTranslationX + 2,
+          dimensions.tileTranslationY + 2,
+        );
+
+        if (tileKey != null && transformation?.translation != null) {
           _controller.reset();
-          _controller.duration = container.translation.duration;
+          _controller.duration = transformation?.duration ?? const Duration();
           _controller.forward().whenComplete(() {
-            if (container.translation.revert) {
-              _controller.reverse();
+            if (transformation?.type == Transformations.swapFailure) {
+              _controller.reverse().whenComplete(() => {game.add(TransformationFinished(tileKey))});
+            } else {
+              game.add(TransformationFinished(tileKey));
             }
           });
         }
 
         return PositionedTransition(
-          key: widget.key,
+          key: tileKey,
           rect: RelativeRectTween(
-            begin: RelativeRect.fromRect(container.box, dimensions.gridRect),
-            end: RelativeRect.fromRect(container.translatedBox, dimensions.gridRect),
-          ).animate(CurvedAnimation(parent: _controller, curve: Curves.ease)),
-          child: BoxUI(key: widget.key),
+            begin: RelativeRect.fromRect(begin, dimensions.gridRect),
+            end: RelativeRect.fromRect(end, dimensions.gridRect),
+          ).animate(CurvedAnimation(parent: _controller, curve: Curves.linear)),
+          child: BoxUI(tileKey: tileKey),
         );
       }),
     );

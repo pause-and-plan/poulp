@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:poulp/models/grid/grid.dart';
+import 'package:poulp/models/grid/transformation.dart';
 import 'package:poulp/models/matching_group.dart';
 import 'package:poulp/models/matching_groups.dart';
 import 'package:poulp/models/transformable.dart';
@@ -32,8 +33,8 @@ class Game {
   }
 
   final Level level;
-  final Map<Key, Tile> tiles;
   final Grid grid;
+  final Map<Key, Tile> tiles;
   final int score;
   final int movesLeft;
 }

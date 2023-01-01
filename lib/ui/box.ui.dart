@@ -5,21 +5,23 @@ import 'package:poulp/models/tile.dart';
 import 'package:poulp/singletons/dimensions.dart';
 
 class BoxUI extends StatelessWidget {
-  const BoxUI({super.key});
+  const BoxUI({super.key, required this.tileKey});
+
+  final Key? tileKey;
 
   @override
   Widget build(BuildContext context) {
     return BlocSelector<GameBloc, GameState, Tile?>(
       selector: ((state) {
-        return state.tiles[key];
+        return state.tiles[tileKey];
       }),
       builder: ((context, state) {
         if (state == null) {
           return const SizedBox.shrink();
         }
         return AnimatedScale(
-          scale: state.container.scaling.value,
-          duration: state.container.scaling.duration,
+          scale: 1,
+          duration: const Duration(milliseconds: 200),
           child: Container(
             clipBehavior: Clip.none,
             height: dimensions.tileHeight.toDouble(),

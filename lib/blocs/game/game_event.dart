@@ -22,3 +22,16 @@ class TileSwap extends GameEvent {
   @override
   List<Object> get props => [start, delta];
 }
+
+class TileExplode extends GameEvent {}
+
+class TileFall extends GameEvent {}
+
+class TransformationFinished extends GameEvent {
+  const TransformationFinished(this.key);
+
+  final Key key;
+
+  @override
+  List<Object> get props => [key];
+}
